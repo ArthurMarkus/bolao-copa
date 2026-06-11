@@ -1,6 +1,8 @@
 import { getRanking } from "@/repositories/guess.repository"
+import { recalcRanking } from "@/services/ranking.service"
 
 export default async function RankingPage() {
+  await recalcRanking()
     const ranking = await getRanking()
 
   return (
