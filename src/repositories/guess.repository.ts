@@ -1,0 +1,45 @@
+import { db } from '@/lib/db';
+import { Guess, RankingEntry } from '@/types';
+
+export async function upsertGuess(userId: number, matchId: number, homeScore: number, awayScore: number): Promise<Guess> {
+    const { rows } = await db.query(`
+        INSERT INTO guesses (user_id, match_id, home_score, away_score) 
+        VALUES ($1, $2, $3, $4)
+        ON CONFLICT (user_id, match_id)
+        DO UPDATE SET home_score = $3, away_score = $4
+        RETURNING *`,
+        [userId, matchId, homeScore, awayScore]
+    )
+
+    return rows[0]
+}
+
+export async function findGuessesByMatch(matchId: number): Promise<Guess[]> {
+    const { rows } = await db.query('SELECT id, user_id, home_score, away_score FROM guesses WHERE match_id = $1', [matchId])
+
+    return rows
+}
+
+export async function findGuessesByUser(userId: number): Promise<Guess[]> {
+    const { rows } = await db.query(
+        'SELECT id, user_id, match_id, home_score, away_score, points FROM guesses WHERE user_id = $1',
+        [userId]
+    )
+    return rows
+}
+
+export async function updateGuessPoints(guessId: number, points: number) {
+    await db.query('UPDATE guesses SET points = $1 WHERE id = $2', [points, guessId])
+}
+
+export async function getRanking(): Promise<RankingEntry[]> {
+    const { rows } = await db.query(`
+        SELECT u.id, u.name, COALESCE(SUM(g.points), 0)::int as total_points
+        FROM users u 
+        LEFT JOIN guesses g ON g.user_id = u.id
+        GROUP BY u.id, u.name
+        ORDER BY total_points DESC`
+    )
+
+    return rows
+}
