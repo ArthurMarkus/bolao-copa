@@ -1,6 +1,7 @@
 "use client"
 import { Match } from "@/types"
 import { useState } from "react"
+import { getFlagEmoji } from "@/lib/flags"
 
 type GuessFormProps = {
   match: Match
@@ -10,9 +11,15 @@ type GuessFormProps = {
 export default function GuessForm({ match, existingGuess }: GuessFormProps) {
   const [homeScore, setHomeScore] = useState(existingGuess?.home_score.toString() ?? "")
   const [awayScore, setAwayScore] = useState(existingGuess?.away_score.toString() ?? "")
-  const [saved, setSaved] = useState(false)
+  const [saved, setSaved] = useState(existingGuess !== undefined)
 
   async function handleSave() {
+    // Validar se os valores são numéricos e não vazios
+    if (homeScore === "" || awayScore === "") {
+      alert("Por favor, preencha ambos os placares para salvar o palpite.")
+      return
+    }
+
     const res = await fetch("/api/guesses", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -26,36 +33,75 @@ export default function GuessForm({ match, existingGuess }: GuessFormProps) {
     else alert("Erro ao salvar palpite")
   }
 
+  const homeFlag = getFlagEmoji(match.team_home)
+  const awayFlag = getFlagEmoji(match.team_away)
+  
+  const formattedDate = new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(match.date))
+
   return (
-    <div className="bg-gray-900 rounded border border-gray-800 p-6">
-      <div className="flex items-center justify-between gap-8">
-        <span className="text-white font-bold text-sm min-w-max">{match.team_home}</span>
-        <div className="flex items-center gap-3">
+    <div className="bg-gradient-to-r from-emerald-950/30 to-green-950/10 backdrop-blur-md rounded-xl border border-emerald-900/60 hover:border-emerald-500/50 p-5 shadow-lg shadow-emerald-950/20 transition-all duration-300">
+      {/* Cabeçalho do Card */}
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-emerald-900/40 text-xs">
+        <span className="text-emerald-400/80 font-medium flex items-center gap-1.5">
+          📅 {formattedDate}
+        </span>
+        <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-0.5 rounded-full font-semibold uppercase tracking-wider text-[10px]">
+          Palpite Aberto
+        </span>
+      </div>
+
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+        {/* Time Casa */}
+        <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
+          <span className="text-white font-bold text-base order-1 sm:order-1">{match.team_home}</span>
+          <span className="text-3xl order-2 sm:order-2 filter drop-shadow-sm" title={match.team_home}>{homeFlag}</span>
+        </div>
+
+        {/* Inputs de Placar */}
+        <div className="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-xl border border-emerald-900/40">
           <input
             type="number"
             min={0}
             value={homeScore}
             onChange={e => { setHomeScore(e.target.value); setSaved(false) }}
-            className="w-14 bg-black text-white text-center rounded border border-gray-700 py-2 text-lg font-bold focus:outline-none focus:border-gray-600"
+            className="w-12 h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            placeholder="-"
           />
-          <span className="text-gray-600 font-bold">x</span>
+          <span className="text-amber-500 font-black text-lg">x</span>
           <input
             type="number"
             min={0}
             value={awayScore}
             onChange={e => { setAwayScore(e.target.value); setSaved(false) }}
-            className="w-14 bg-black text-white text-center rounded border border-gray-700 py-2 text-lg font-bold focus:outline-none focus:border-gray-600"
+            className="w-12 h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            placeholder="-"
           />
         </div>
-        <span className="text-white font-bold text-sm min-w-max">{match.team_away}</span>
-        <button
-          onClick={handleSave}
-          className={`px-5 py-2 rounded text-xs font-medium transition-colors whitespace-nowrap ${
-            saved ? "bg-gray-900 text-gray-600 cursor-default" : "bg-gray-900 hover:bg-gray-800 text-white"
-          }`}
-        >
-          {saved ? "✓ Salvo" : "Salvar"}
-        </button>
+
+        {/* Time Fora */}
+        <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
+          <span className="text-3xl filter drop-shadow-sm" title={match.team_away}>{awayFlag}</span>
+          <span className="text-white font-bold text-base">{match.team_away}</span>
+        </div>
+
+        {/* Ação */}
+        <div className="w-full sm:w-auto flex justify-center sm:justify-end min-w-[120px]">
+          <button
+            onClick={handleSave}
+            className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-md ${
+              saved 
+                ? "bg-emerald-600/80 hover:bg-emerald-600 text-white border border-emerald-500 cursor-default shadow-emerald-900/30" 
+                : "bg-amber-500 hover:bg-amber-400 text-emerald-950 border border-amber-400 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-amber-950/30"
+            }`}
+          >
+            {saved ? "✓ Salvo" : "Salvar"}
+          </button>
+        </div>
       </div>
     </div>
   )
