@@ -2,9 +2,11 @@ import GuessForm from "@/components/guess-form"
 import { getSession } from "@/lib/auth"
 import { getMatches } from "@/lib/worldcup-api"
 import { findGuessesByUser } from "@/repositories/guess.repository"
+import { recalcRanking } from "@/services/ranking.service"
 import { redirect } from "next/navigation"
 
 export default async function MatchesPage() {
+   await recalcRanking()
   const session = await getSession()
   if (!session) redirect("/login")
 
