@@ -2,6 +2,7 @@
 import { Match } from "@/types"
 import { useState } from "react"
 import { getFlagEmoji } from "@/lib/flags"
+import FlagEmoji from "@/components/flag-emoji"
 
 type GuessFormProps = {
   match: Match
@@ -59,7 +60,7 @@ export default function GuessForm({ match, existingGuess }: GuessFormProps) {
         {/* Time Casa */}
         <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
           <span className="text-white font-bold text-base order-1 sm:order-1">{match.team_home}</span>
-          <span className="text-3xl order-2 sm:order-2 filter drop-shadow-sm" title={match.team_home}>{homeFlag}</span>
+          <FlagEmoji emoji={homeFlag} title={match.team_home} size={32} className="order-2 sm:order-2 drop-shadow-sm" />
         </div>
 
         {/* Inputs de Placar */}
@@ -85,7 +86,7 @@ export default function GuessForm({ match, existingGuess }: GuessFormProps) {
 
         {/* Time Fora */}
         <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-          <span className="text-3xl filter drop-shadow-sm" title={match.team_away}>{awayFlag}</span>
+          <FlagEmoji emoji={awayFlag} title={match.team_away} size={32} className="drop-shadow-sm" />
           <span className="text-white font-bold text-base">{match.team_away}</span>
         </div>
 

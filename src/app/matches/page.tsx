@@ -2,6 +2,7 @@ import GuessForm from "@/components/guess-form"
 import { getSession } from "@/lib/auth"
 import { getMatches } from "@/lib/worldcup-api"
 import { getFlagEmoji } from "@/lib/flags"
+import FlagEmoji from "@/components/flag-emoji"
 import { findGuessesByUser } from "@/repositories/guess.repository"
 import { recalcRanking } from "@/services/ranking.service"
 import { redirect } from "next/navigation"
@@ -67,7 +68,7 @@ export default async function MatchesPage() {
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
                       <span className="text-white font-bold text-base order-1 sm:order-1">{m.team_home}</span>
-                      <span className="text-3xl order-2 sm:order-2 filter drop-shadow-sm" title={m.team_home}>{homeFlag}</span>
+                      <FlagEmoji emoji={homeFlag} title={m.team_home} size={32} className="order-2 sm:order-2 drop-shadow-sm" />
                     </div>
                     
                     <div className="flex items-center gap-3 bg-black/60 px-5 py-2.5 rounded-xl border border-red-900/30">
@@ -77,7 +78,7 @@ export default async function MatchesPage() {
                     </div>
                     
                     <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <span className="text-3xl filter drop-shadow-sm" title={m.team_away}>{awayFlag}</span>
+                      <FlagEmoji emoji={awayFlag} title={m.team_away} size={32} className="drop-shadow-sm" />
                       <span className="text-white font-bold text-base">{m.team_away}</span>
                     </div>
                     
@@ -101,7 +102,7 @@ export default async function MatchesPage() {
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
                       <span className="text-white font-bold text-base order-1 sm:order-1">{m.team_home}</span>
-                      <span className="text-3xl order-2 sm:order-2 filter drop-shadow-sm" title={m.team_home}>{homeFlag}</span>
+                      <FlagEmoji emoji={homeFlag} title={m.team_home} size={32} className="order-2 sm:order-2 drop-shadow-sm" />
                     </div>
                     
                     <div className="flex items-center gap-3 bg-black/40 px-5 py-2.5 rounded-xl border border-gray-800">
@@ -111,7 +112,7 @@ export default async function MatchesPage() {
                     </div>
                     
                     <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <span className="text-3xl filter drop-shadow-sm" title={m.team_away}>{awayFlag}</span>
+                      <FlagEmoji emoji={awayFlag} title={m.team_away} size={32} className="drop-shadow-sm" />
                       <span className="text-white font-bold text-base">{m.team_away}</span>
                     </div>
 
