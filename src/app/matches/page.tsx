@@ -1,26 +1,26 @@
-import GuessForm from "@/components/guess-form"
-import { getSession } from "@/lib/auth"
-import { getMatches } from "@/lib/worldcup-api"
-import { getFlagEmoji } from "@/lib/flags"
-import FlagEmoji from "@/components/flag-emoji"
-import { findGuessesByUser } from "@/repositories/guess.repository"
-import { recalcRanking } from "@/services/ranking.service"
-import { redirect } from "next/navigation"
+import GuessForm from "@/components/guess-form";
+import { getSession } from "@/lib/auth";
+import { getMatches } from "@/lib/worldcup-api";
+import { getFlagEmoji } from "@/lib/flags";
+import FlagEmoji from "@/components/flag-emoji";
+import { findGuessesByUser } from "@/repositories/guess.repository";
+import { recalcRanking } from "@/services/ranking.service";
+import { redirect } from "next/navigation";
 
 export default async function MatchesPage() {
-  await recalcRanking()
-  const session = await getSession()
-  if (!session) redirect("/login")
+  await recalcRanking();
+  const session = await getSession();
+  if (!session) redirect("/login");
 
   const [matches, guesses] = await Promise.all([
     getMatches(),
     findGuessesByUser(session.userId),
-  ])
+  ]);
 
   // Filtra apenas partidas com times confirmados
   const confirmedMatches = matches.filter(
-    m => m.team_home !== "A definir" && m.team_away !== "A definir"
-  )
+    (m) => m.team_home !== "A definir" && m.team_away !== "A definir",
+  );
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-2">
@@ -36,16 +36,16 @@ export default async function MatchesPage() {
       </div>
 
       <div className="space-y-5">
-        {confirmedMatches.map(m => {
-          const guess = guesses.find(g => g.match_id === m.id_match)
-          const homeFlag = getFlagEmoji(m.team_home)
-          const awayFlag = getFlagEmoji(m.team_away)
-          const formattedDate = new Intl.DateTimeFormat('pt-BR', {
-            day: '2-digit',
-            month: 'short',
-            hour: '2-digit',
-            minute: '2-digit',
-          }).format(new Date(m.date))
+        {confirmedMatches.map((m) => {
+          const guess = guesses.find((g) => g.match_id === m.id_match);
+          const homeFlag = getFlagEmoji(m.team_home);
+          const awayFlag = getFlagEmoji(m.team_away);
+          const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+            day: "2-digit",
+            month: "short",
+            hour: "2-digit",
+            minute: "2-digit",
+          }).format(new Date(m.date));
 
           return (
             <div key={m.id_match} className="transition-all duration-200">
@@ -64,24 +64,44 @@ export default async function MatchesPage() {
                       Ao Vivo
                     </span>
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
-                      <span className="text-white font-bold text-base order-1 sm:order-1">{m.team_home}</span>
-                      <FlagEmoji emoji={homeFlag} title={m.team_home} size={32} className="order-2 sm:order-2 drop-shadow-sm" />
+                      <span className="text-white font-bold text-base order-1 sm:order-1">
+                        {m.team_home}
+                      </span>
+                      <FlagEmoji
+                        emoji={homeFlag}
+                        title={m.team_home}
+                        size={32}
+                        className="order-2 sm:order-2 drop-shadow-sm"
+                      />
                     </div>
-                    
+
                     <div className="flex items-center gap-3 bg-black/60 px-5 py-2.5 rounded-xl border border-red-900/30">
-                      <span className="text-white font-black text-2xl px-2">{m.home_score ?? 0}</span>
-                      <span className="text-amber-500 font-black text-lg">-</span>
-                      <span className="text-white font-black text-2xl px-2">{m.away_score ?? 0}</span>
+                      <span className="text-white font-black text-2xl px-2">
+                        {m.home_score ?? 0}
+                      </span>
+                      <span className="text-amber-500 font-black text-lg">
+                        -
+                      </span>
+                      <span className="text-white font-black text-2xl px-2">
+                        {m.away_score ?? 0}
+                      </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <FlagEmoji emoji={awayFlag} title={m.team_away} size={32} className="drop-shadow-sm" />
-                      <span className="text-white font-bold text-base">{m.team_away}</span>
+                      <FlagEmoji
+                        emoji={awayFlag}
+                        title={m.team_away}
+                        size={32}
+                        className="drop-shadow-sm"
+                      />
+                      <span className="text-white font-bold text-base">
+                        {m.team_away}
+                      </span>
                     </div>
-                    
+
                     {/* Alinhador de tamanho para ficar igual ao card TIMED */}
                     <div className="hidden sm:block w-[120px]"></div>
                   </div>
@@ -98,38 +118,66 @@ export default async function MatchesPage() {
                       Finalizado
                     </span>
                   </div>
-                  
+
                   <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
-                      <span className="text-white font-bold text-base order-1 sm:order-1">{m.team_home}</span>
-                      <FlagEmoji emoji={homeFlag} title={m.team_home} size={32} className="order-2 sm:order-2 drop-shadow-sm" />
+                      <span className="text-white font-bold text-base order-1 sm:order-1">
+                        {m.team_home}
+                      </span>
+                      <FlagEmoji
+                        emoji={homeFlag}
+                        title={m.team_home}
+                        size={32}
+                        className="order-2 sm:order-2 drop-shadow-sm"
+                      />
                     </div>
-                    
+
                     <div className="flex items-center gap-3 bg-black/40 px-5 py-2.5 rounded-xl border border-gray-800">
-                      <span className="text-white font-extrabold text-2xl px-2">{m.home_score}</span>
-                      <span className="text-gray-500 font-black text-lg">x</span>
-                      <span className="text-white font-extrabold text-2xl px-2">{m.away_score}</span>
+                      <span className="text-white font-extrabold text-2xl px-2">
+                        {m.home_score}
+                      </span>
+                      <span className="text-gray-500 font-black text-lg">
+                        x
+                      </span>
+                      <span className="text-white font-extrabold text-2xl px-2">
+                        {m.away_score}
+                      </span>
                     </div>
-                    
+
                     <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <FlagEmoji emoji={awayFlag} title={m.team_away} size={32} className="drop-shadow-sm" />
-                      <span className="text-white font-bold text-base">{m.team_away}</span>
+                      <FlagEmoji
+                        emoji={awayFlag}
+                        title={m.team_away}
+                        size={32}
+                        className="drop-shadow-sm"
+                      />
+                      <span className="text-white font-bold text-base">
+                        {m.team_away}
+                      </span>
                     </div>
 
                     {guess ? (
                       <div className="w-full sm:w-auto min-w-[120px] text-center sm:text-right bg-gray-950/60 px-3 py-2 rounded-lg border border-gray-800/50">
-                        <div className="text-[10px] text-gray-500 uppercase font-semibold">Seu Palpite</div>
+                        <div className="text-[10px] text-gray-500 uppercase font-semibold">
+                          Seu Palpite
+                        </div>
                         <div className="text-white font-bold text-sm">
                           {guess.home_score} x {guess.away_score}
                         </div>
-                        <div className={`text-[11px] font-black mt-0.5 ${
-                          guess.points === 2 ? "text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.2)]" :
-                          guess.points === 1 ? "text-emerald-400" :
-                          "text-gray-500"
-                        }`}>
-                          {guess.points === 2 ? "🎯 +2 pts (Placar Cheio)" :
-                           guess.points === 1 ? "⚖️ +1 pt (Vencedor)" :
-                           "❌ 0 pts"}
+                        <div
+                          className={`text-[11px] font-black mt-0.5 ${
+                            guess.points === 2
+                              ? "text-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.2)]"
+                              : guess.points === 1
+                                ? "text-emerald-400"
+                                : "text-gray-500"
+                          }`}
+                        >
+                          {guess.points === 2
+                            ? "🎯 +2 pts (Placar Cheio)"
+                            : guess.points === 1
+                              ? "⚖️ +1 pt (Vencedor)"
+                              : "❌ 0 pts"}
                         </div>
                       </div>
                     ) : (
@@ -140,10 +188,66 @@ export default async function MatchesPage() {
                   </div>
                 </div>
               )}
+
+              {m.status === "PAUSED" && (
+                <div className="bg-gradient-to-r from-amber-900/20 to-yellow-900/10 backdrop-blur-md rounded-xl border border-amber-900/40 p-5 shadow-lg shadow-amber-900/10">
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-amber-900/20 text-xs">
+                    <span className="text-amber-400/80 font-medium flex items-center gap-1.5">
+                      📅 {formattedDate}
+                    </span>
+
+                    <span className="flex items-center gap-1.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 px-2.5 py-0.5 rounded-full font-bold uppercase tracking-wider text-[10px]">
+                      <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                      Pausado
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
+                      <span className="text-white font-bold text-base order-1 sm:order-1">
+                        {m.team_home}
+                      </span>
+                      <FlagEmoji
+                        emoji={homeFlag}
+                        title={m.team_home}
+                        size={32}
+                        className="order-2 sm:order-2 drop-shadow-sm"
+                      />
+                    </div>
+
+                    <div className="flex items-center gap-3 bg-black/40 px-5 py-2.5 rounded-xl border border-gray-800">
+                      <span className="text-white font-extrabold text-2xl px-2">
+                        {m.home_score}
+                      </span>
+                      <span className="text-gray-500 font-black text-lg">
+                        x
+                      </span>
+                      <span className="text-white font-extrabold text-2xl px-2">
+                        {m.away_score}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
+                      <FlagEmoji
+                        emoji={awayFlag}
+                        title={m.team_away}
+                        size={32}
+                        className="drop-shadow-sm"
+                      />
+                      <span className="text-white font-bold text-base">
+                        {m.team_away}
+                      </span>
+                    </div>
+
+                    {/* Alinhador de tamanho para ficar igual ao card TIMED */}
+                    <div className="hidden sm:block w-[120px]"></div>
+                  </div>
+                </div>
+              )}
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
