@@ -15,8 +15,17 @@ export async function upsertGuess(userId: number, matchId: number, homeScore: nu
 }
 
 export async function findGuessesByMatch(matchId: number): Promise<Guess[]> {
-    const { rows } = await db.query('SELECT id, user_id, home_score, away_score FROM guesses WHERE match_id = $1', [matchId])
+    const { rows } = await db.query('SELECT id, user_id, match_id, home_score, away_score, points FROM guesses WHERE match_id = $1', [matchId])
 
+    return rows
+}
+
+export async function findGuessesByMatchIds(matchIds: number[]): Promise<Guess[]> {
+    if (matchIds.length === 0) return []
+    const { rows } = await db.query(
+        'SELECT id, user_id, match_id, home_score, away_score, points FROM guesses WHERE match_id = ANY($1)',
+        [matchIds]
+    )
     return rows
 }
 
