@@ -1,5 +1,6 @@
 import { getRanking } from "@/repositories/guess.repository"
 import { recalcRanking } from "@/services/ranking.service"
+import RankingList from "@/components/ranking-list"
 
 export const metadata = {
   title: "Classificação Geral | Bolão da Copa",
@@ -74,103 +75,7 @@ export default async function RankingPage() {
       )}
 
       {/* Ranking List */}
-      <div className="space-y-3">
-        {ranking.length === 0 ? (
-          <div className="bg-white/[0.02] backdrop-blur-md border border-white/[0.06] rounded-2xl p-12 text-center">
-            <p className="text-gray-400 text-base">Nenhum jogador pontuou ainda. Os palpites começarão a valer assim que os jogos iniciarem!</p>
-          </div>
-        ) : (
-          ranking.map((entry, index) => {
-            const isFirst = index === 0
-            const isSecond = index === 1
-            const isThird = index === 2
-            
-            // Generate initials
-            const initials = entry.name
-              ? entry.name
-                  .split(" ")
-                  .filter(Boolean)
-                  .map(n => n[0])
-                  .join("")
-                  .substring(0, 2)
-                  .toUpperCase()
-              : "?"
-
-            // Position badges
-            let positionBadge = null
-            let cardStyle = "bg-white/[0.01] hover:bg-white/[0.03] border-white/[0.06] hover:border-white/[0.1] text-gray-300"
-            let rankColorClass = "text-gray-400"
-            let pointsStyle = "text-white font-bold"
-            let avatarBorder = "border-white/10 bg-white/5"
-
-            if (isFirst) {
-              positionBadge = "🥇"
-              cardStyle = "bg-gradient-to-r from-amber-500/12 via-amber-500/5 to-transparent border-amber-500/40 hover:border-amber-500/60 shadow-lg shadow-amber-500/5"
-              rankColorClass = "text-amber-400 font-black text-2xl"
-              pointsStyle = "text-amber-400 font-black text-xl drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]"
-              avatarBorder = "border-amber-500/50 bg-amber-500/10 text-amber-300"
-            } else if (isSecond) {
-              positionBadge = "🥈"
-              cardStyle = "bg-gradient-to-r from-slate-400/12 via-slate-400/5 to-transparent border-slate-400/30 hover:border-slate-400/50 shadow-md shadow-slate-400/5"
-              rankColorClass = "text-slate-300 font-black text-2xl"
-              pointsStyle = "text-slate-300 font-extrabold text-xl"
-              avatarBorder = "border-slate-400/40 bg-slate-400/10 text-slate-300"
-            } else if (isThird) {
-              positionBadge = "🥉"
-              cardStyle = "bg-gradient-to-r from-amber-700/12 via-amber-700/5 to-transparent border-amber-700/30 hover:border-amber-700/50 shadow-md shadow-amber-700/5"
-              rankColorClass = "text-amber-600 font-black text-2xl"
-              pointsStyle = "text-amber-600 font-extrabold text-xl"
-              avatarBorder = "border-amber-700/40 bg-amber-700/10 text-amber-600"
-            }
-
-            return (
-              <div
-                key={entry.user_id}
-                className={`flex items-center gap-4 sm:gap-6 rounded-2xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-0.5 ${cardStyle}`}
-              >
-                {/* Ranking Position */}
-                <div className="flex items-center justify-center w-10 sm:w-12 text-center">
-                  {positionBadge ? (
-                    <span className="text-3xl filter drop-shadow-sm select-none">{positionBadge}</span>
-                  ) : (
-                    <span className={`text-base font-bold ${rankColorClass}`}>{index + 1}</span>
-                  )}
-                </div>
-
-                {/* Initial Avatar */}
-                <div className={`hidden sm:flex items-center justify-center w-11 h-11 rounded-full border font-bold text-sm ${avatarBorder}`}>
-                  {initials}
-                </div>
-
-                {/* User Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className={`font-semibold text-base sm:text-lg truncate ${isFirst ? 'text-white' : 'text-gray-200'}`}>
-                      {entry.name}
-                    </span>
-                    {isFirst && (
-                      <span className="bg-amber-500/15 text-amber-400 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-500/20 tracking-wider">
-                        Líder
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-500 mt-0.5">Participante do Bolão ⚽</p>
-                </div>
-
-                {/* User Score */}
-                <div className="text-right">
-                  <span className={`${pointsStyle}`}>
-                    {entry.total_points}
-                  </span>
-                  <span className="text-[10px] sm:text-xs text-gray-400 uppercase font-semibold tracking-wider block sm:inline sm:ml-1">
-                    pts
-                  </span>
-                </div>
-              </div>
-            )
-          })
-        )}
-      </div>
+      <RankingList ranking={ranking} />
     </div>
   )
 }

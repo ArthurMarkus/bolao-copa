@@ -43,7 +43,7 @@ export async function updateGuessPoints(guessId: number, points: number) {
 
 export async function getRanking(): Promise<RankingEntry[]> {
     const { rows } = await db.query(`
-        SELECT u.id, u.name, COALESCE(SUM(g.points), 0)::int as total_points
+        SELECT u.id as user_id, u.name, COALESCE(SUM(g.points), 0)::int as total_points
         FROM users u 
         LEFT JOIN guesses g ON g.user_id = u.id
         GROUP BY u.id, u.name
