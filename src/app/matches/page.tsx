@@ -7,6 +7,7 @@ import GuessDisplay from "@/components/guess-display";
 import { findGuessesByUser } from "@/repositories/guess.repository";
 import { recalcRanking } from "@/services/ranking.service";
 import { redirect } from "next/navigation";
+import ScrollToActiveMatch from "@/components/scroll-to-active-match";
 
 export default async function MatchesPage() {
   await recalcRanking();
@@ -23,8 +24,22 @@ export default async function MatchesPage() {
     (m) => m.team_home !== "A definir" && m.team_away !== "A definir",
   );
 
+  // Determina a partida ativa/próxima para scroll automático
+  let activeMatchId = confirmedMatches.find(
+    (m) => m.status === "IN_PLAY" || m.status === "PAUSED"
+  )?.id_match;
+
+  if (!activeMatchId) {
+    activeMatchId = confirmedMatches.find((m) => m.status === "TIMED")?.id_match;
+  }
+
+  if (!activeMatchId && confirmedMatches.length > 0) {
+    activeMatchId = confirmedMatches[confirmedMatches.length - 1].id_match;
+  }
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-2">
+      {activeMatchId && <ScrollToActiveMatch matchId={activeMatchId} />}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-white text-3xl font-extrabold tracking-tight flex items-center gap-3">
@@ -49,7 +64,11 @@ export default async function MatchesPage() {
           }).format(new Date(m.date));
 
           return (
-            <div key={m.id_match} className="transition-all duration-200">
+            <div
+              key={m.id_match}
+              id={`match-${m.id_match}`}
+              className="transition-all duration-200 scroll-mt-6 rounded-xl"
+            >
               {m.status === "TIMED" && (
                 <GuessForm match={m} existingGuess={guess} />
               )}
