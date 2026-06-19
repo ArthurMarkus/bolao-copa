@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
     
     res.cookies.set('token', token, {
         httpOnly: true,
-        maxAge: 60 * 60 * 24 * 7
+        maxAge: 60 * 60 * 24 * 40
     })
 
     return res

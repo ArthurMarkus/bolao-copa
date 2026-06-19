@@ -9,7 +9,7 @@ export function hashPassword(password: string): string {
 const SECRET = process.env.JWT_SECRET!
 
 export function signToken(userId: number): string {
-    return jwt.sign({ userId }, SECRET, { expiresIn: '7d' })
+    return jwt.sign({ userId }, SECRET, { expiresIn: '40d' })
 }
 
 export async function getSession(): Promise<{ userId: number } | null> {
