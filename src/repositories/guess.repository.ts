@@ -60,7 +60,7 @@ export async function getMostCorrectGuesses(): Promise<{ name: string, count: nu
         JOIN users u ON u.id = g.user_id
         WHERE g.points > 0
         GROUP BY u.id, u.name
-        HAVING COUNT(*) >= 10
+        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id) >= 10
         ORDER BY count DESC
         LIMIT 1 `
     )
@@ -75,7 +75,7 @@ export async function getMostPerfectScores(): Promise<{ name: string, count: num
         JOIN users u ON u.id = g.user_id
         WHERE g.points > 1
         GROUP BY u.id, u.name
-        HAVING COUNT(*) >= 10
+        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id) >= 10
         ORDER BY count DESC
         LIMIT 1 `
     )
@@ -90,7 +90,7 @@ export async function getLeastCorrectGuesses(): Promise<{ name: string, count: n
         JOIN users u ON u.id = g.user_id
         WHERE g.points = 0
         GROUP BY u.id, u.name
-        HAVING COUNT(*) >= 10
+        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id) >= 10
         ORDER BY count DESC
         LIMIT 1 `
     )
