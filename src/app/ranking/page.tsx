@@ -6,6 +6,7 @@ import {
 } from "@/repositories/guess.repository";
 import { recalcRanking } from "@/services/ranking.service";
 import RankingList from "@/components/ranking-list";
+import { getMatches } from "@/lib/worldcup-api";
 
 export const metadata = {
   title: "Classificação Geral | Bolão da Copa",
@@ -15,11 +16,16 @@ export const metadata = {
 
 export default async function RankingPage() {
   await recalcRanking();
+  const allMatches = await getMatches()
+  const finishedMatchIds = allMatches
+    .filter(m => m.status === 'FINISHED')
+    .map(m => m.id_match)
+    
   const [ranking, mostCorrect, mostPerfect, leastCorrect] = await Promise.all([
     getRanking(),
-    getMostCorrectGuesses(),
-    getMostPerfectScores(),
-    getLeastCorrectGuesses(),
+    getMostCorrectGuesses(finishedMatchIds),
+    getMostPerfectScores(finishedMatchIds),
+    getLeastCorrectGuesses(finishedMatchIds)
   ]);
 
   return (

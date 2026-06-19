@@ -53,46 +53,46 @@ export async function getRanking(): Promise<RankingEntry[]> {
     return rows
 }
 
-export async function getMostCorrectGuesses(): Promise<{ name: string, count: number }> {
+export async function getMostCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }> {
     const { rows } = await db.query(`
         SELECT u.name, COUNT(*) as count
         FROM guesses g
         JOIN users u ON u.id = g.user_id
-        WHERE g.points > 0
+        WHERE g.points > 0 AND g.match_id = ANY($1)
         GROUP BY u.id, u.name
-        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id) >= 10
+        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id AND match_id = ANY($1)) >= 10
         ORDER BY count DESC
-        LIMIT 1 `
+        LIMIT 1 `, [matchIds]
     )
 
     return rows[0]
 }
 
-export async function getMostPerfectScores(): Promise<{ name: string, count: number }> {
+export async function getMostPerfectScores(matchIds: number[]): Promise<{ name: string, count: number }> {
     const { rows } = await db.query(`
         SELECT u.name, COUNT(*) as count
         FROM guesses g
         JOIN users u ON u.id = g.user_id
-        WHERE g.points > 1
+        WHERE g.points > 1 AND g.match_id = ANY($1)
         GROUP BY u.id, u.name
-        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id) >= 10
+        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id AND match_id = ANY($1)) >= 10
         ORDER BY count DESC
-        LIMIT 1 `
+        LIMIT 1 `, [matchIds]
     )
 
     return rows[0]
 }
 
-export async function getLeastCorrectGuesses(): Promise<{ name: string, count: number }> {
+export async function getLeastCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }> {
     const { rows } = await db.query(`
         SELECT u.name, COUNT(*) as count
         FROM guesses g
         JOIN users u ON u.id = g.user_id
-        WHERE g.points = 0
+        WHERE g.points = 0 AND g.match_id = ANY($1)
         GROUP BY u.id, u.name
-        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id) >= 10
+        HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id AND match_id = ANY($1)) >= 10
         ORDER BY count DESC
-        LIMIT 1 `
+        LIMIT 1 `, [matchIds]
     )
 
     return rows[0]
