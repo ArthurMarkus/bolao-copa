@@ -9,9 +9,9 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   if (!showSidebar) return <>{children}</>
 
   return (
-    <div className="flex min-h-screen bg-black">
+    <div className="flex flex-col md:flex-row min-h-screen bg-black">
       <Sidebar />
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 pt-20 pb-24 md:p-8">
         {children}
       </main>
     </div>

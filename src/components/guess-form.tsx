@@ -56,42 +56,45 @@ export default function GuessForm({ match, existingGuess }: GuessFormProps) {
         </span>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-        {/* Time Casa */}
-        <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
-          <span className="text-white font-bold text-base order-1 sm:order-1">{match.team_home}</span>
-          <FlagEmoji emoji={homeFlag} title={match.team_home} size={32} className="order-2 sm:order-2 drop-shadow-sm" />
-        </div>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+        {/* Match Row (Always Horizontal) */}
+        <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-6">
+          {/* Time Casa */}
+          <div className="flex items-center gap-2 sm:gap-3 justify-end flex-1 min-w-0">
+            <span className="text-white font-bold text-sm sm:text-base truncate order-1 sm:order-1">{match.team_home}</span>
+            <FlagEmoji emoji={homeFlag} title={match.team_home} size={28} className="order-2 sm:order-2 drop-shadow-sm shrink-0 sm:w-8 sm:h-8" />
+          </div>
 
-        {/* Inputs de Placar */}
-        <div className="flex items-center gap-3 bg-black/40 px-4 py-2 rounded-xl border border-emerald-900/40">
-          <input
-            type="number"
-            min={0}
-            value={homeScore}
-            onChange={e => { setHomeScore(e.target.value); setSaved(false) }}
-            className="w-12 h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            placeholder="-"
-          />
-          <span className="text-amber-500 font-black text-lg">x</span>
-          <input
-            type="number"
-            min={0}
-            value={awayScore}
-            onChange={e => { setAwayScore(e.target.value); setSaved(false) }}
-            className="w-12 h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-            placeholder="-"
-          />
-        </div>
+          {/* Inputs de Placar */}
+          <div className="flex items-center gap-2 sm:gap-3 bg-black/40 px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl border border-emerald-900/40 shrink-0">
+            <input
+              type="number"
+              min={0}
+              value={homeScore}
+              onChange={e => { setHomeScore(e.target.value); setSaved(false) }}
+              className="w-10 h-8 sm:w-12 sm:h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-lg sm:text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              placeholder="-"
+            />
+            <span className="text-amber-500 font-black text-sm sm:text-lg">x</span>
+            <input
+              type="number"
+              min={0}
+              value={awayScore}
+              onChange={e => { setAwayScore(e.target.value); setSaved(false) }}
+              className="w-10 h-8 sm:w-12 sm:h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-lg sm:text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              placeholder="-"
+            />
+          </div>
 
-        {/* Time Fora */}
-        <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-          <FlagEmoji emoji={awayFlag} title={match.team_away} size={32} className="drop-shadow-sm" />
-          <span className="text-white font-bold text-base">{match.team_away}</span>
+          {/* Time Fora */}
+          <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
+            <FlagEmoji emoji={awayFlag} title={match.team_away} size={28} className="drop-shadow-sm shrink-0 sm:w-8 sm:h-8" />
+            <span className="text-white font-bold text-sm sm:text-base truncate">{match.team_away}</span>
+          </div>
         </div>
 
         {/* Ação */}
-        <div className="w-full sm:w-auto flex justify-center sm:justify-end min-w-[120px]">
+        <div className="w-full sm:w-auto flex justify-center sm:justify-end min-w-[120px] shrink-0">
           <button
             onClick={handleSave}
             className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-md ${

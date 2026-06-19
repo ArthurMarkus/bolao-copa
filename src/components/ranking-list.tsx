@@ -240,89 +240,87 @@ export default function RankingList({ ranking }: RankingListProps) {
                         return (
                           <div
                             key={m.id_match}
-                            className="bg-white/[0.01] hover:bg-white/[0.02] border border-white/[0.04] rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 transition-all duration-200"
+                            className="bg-white/[0.01] hover:bg-white/[0.02] border border-white/[0.04] rounded-2xl p-4 flex flex-col gap-3 transition-all duration-200"
                           >
-                            {/* Match Info */}
-                            <div className="text-center sm:text-left">
+                            {/* Match Header (Date and Status) */}
+                            <div className="flex items-center justify-between text-xs border-b border-white/[0.03] pb-2 w-full">
                               <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
                                 📅 {formattedDate}
                               </span>
-                              <div className="flex items-center gap-1.5 justify-center sm:justify-start mt-0.5">
-                                <span className="bg-gray-800 text-gray-400 border border-white/5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
-                                  Finalizado
-                                </span>
-                              </div>
+                              <span className="bg-gray-800 text-gray-400 border border-white/5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
+                                Finalizado
+                              </span>
                             </div>
 
-                            {/* Teams and Score */}
-                            <div className="flex items-center gap-3 justify-center flex-1 max-w-xs">
-                              <div className="flex items-center gap-2 text-right flex-1 justify-end min-w-0">
-                                <span className="text-white text-xs font-bold truncate">
-                                  {m.team_home}
-                                </span>
-                                <FlagEmoji
-                                  emoji={homeFlag}
-                                  title={m.team_home}
-                                  size={20}
-                                  className="drop-shadow-sm shrink-0"
-                                />
-                              </div>
-
-                              {/* Match Real Score */}
-                              <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 text-xs font-bold text-gray-455 shrink-0">
-                                <span>{m.home_score ?? "-"}</span>
-                                <span className="text-[10px] text-gray-600">
-                                  x
-                                </span>
-                                <span>{m.away_score ?? "-"}</span>
-                              </div>
-
-                              <div className="flex items-center gap-2 text-left flex-1 justify-start min-w-0">
-                                <FlagEmoji
-                                  emoji={awayFlag}
-                                  title={m.team_away}
-                                  size={20}
-                                  className="drop-shadow-sm shrink-0"
-                                />
-                                <span className="text-white text-xs font-bold truncate">
-                                  {m.team_away}
-                                </span>
-                              </div>
-                            </div>
-
-                            {/* User Guess */}
-                            <div className="min-w-[120px] text-center sm:text-right">
-                              {m.guess ? (
-                                <div>
-                                  <span className="text-[9px] text-gray-500 uppercase font-semibold block">
-                                    Palpite
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+                              {/* Teams and Score (Always Horizontal) */}
+                              <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-4 sm:max-w-md">
+                                <div className="flex items-center gap-2 text-right flex-1 justify-end min-w-0">
+                                  <span className="text-white text-xs font-bold truncate">
+                                    {m.team_home}
                                   </span>
-                                  <span className="text-white text-xs font-extrabold">
-                                    {m.guess.home_score} x {m.guess.away_score}
-                                  </span>
-                                  {m.guess.points !== null && (
-                                    <span
-                                      className={`block text-[10px] font-black mt-0.5 ${
-                                        m.guess.points === 2
-                                          ? "text-amber-400"
-                                          : m.guess.points === 1
-                                            ? "text-emerald-400"
-                                            : "text-gray-500"
-                                      }`}
-                                    >
-                                      {m.guess.points === 2
-                                        ? "🎯 +2 pts"
-                                        : m.guess.points === 1
-                                          ? "⚖️ +1 pt"
-                                          : "❌ 0 pts"}
-                                    </span>
-                                  )}
+                                  <FlagEmoji
+                                    emoji={homeFlag}
+                                    title={m.team_home}
+                                    size={20}
+                                    className="drop-shadow-sm shrink-0"
+                                  />
                                 </div>
-                              ) : (
-                                <span className="text-xs text-gray-600 italic">
-                                  Sem palpite
-                                </span>
-                              )}
+
+                                {/* Match Real Score */}
+                                <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 text-xs font-bold text-gray-400 shrink-0">
+                                  <span>{m.home_score ?? "-"}</span>
+                                  <span className="text-[10px] text-gray-600">x</span>
+                                  <span>{m.away_score ?? "-"}</span>
+                                </div>
+
+                                <div className="flex items-center gap-2 text-left flex-1 justify-start min-w-0">
+                                  <FlagEmoji
+                                    emoji={awayFlag}
+                                    title={m.team_away}
+                                    size={20}
+                                    className="drop-shadow-sm shrink-0"
+                                  />
+                                  <span className="text-white text-xs font-bold truncate">
+                                    {m.team_away}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {/* User Guess */}
+                              <div className="min-w-[120px] text-center sm:text-right w-full sm:w-auto bg-black/20 sm:bg-transparent py-2 sm:py-0 rounded-xl border border-white/5 sm:border-0">
+                                {m.guess ? (
+                                  <div>
+                                    <span className="text-[9px] text-gray-500 uppercase font-semibold block">
+                                      Palpite
+                                    </span>
+                                    <span className="text-white text-xs font-extrabold">
+                                      {m.guess.home_score} x {m.guess.away_score}
+                                    </span>
+                                    {m.guess.points !== null && (
+                                      <span
+                                        className={`block text-[10px] font-black mt-0.5 ${
+                                          m.guess.points === 2
+                                            ? "text-amber-400"
+                                            : m.guess.points === 1
+                                              ? "text-emerald-400"
+                                              : "text-gray-500"
+                                        }`}
+                                      >
+                                        {m.guess.points === 2
+                                          ? "🎯 +2 pts"
+                                          : m.guess.points === 1
+                                            ? "⚖️ +1 pt"
+                                            : "❌ 0 pts"}
+                                      </span>
+                                    )}
+                                  </div>
+                                ) : (
+                                  <span className="text-xs text-gray-600 italic">
+                                    Sem palpite
+                                  </span>
+                                )}
+                              </div>
                             </div>
                           </div>
                         );

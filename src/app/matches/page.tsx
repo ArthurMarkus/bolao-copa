@@ -85,41 +85,47 @@ export default async function MatchesPage() {
                     </span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
-                      <span className="text-white font-bold text-base order-1 sm:order-1">
-                        {m.team_home}
-                      </span>
-                      <FlagEmoji
-                        emoji={homeFlag}
-                        title={m.team_home}
-                        size={32}
-                        className="order-2 sm:order-2 drop-shadow-sm"
-                      />
-                    </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+                    {/* Match Row (Always Horizontal) */}
+                    <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-6">
+                      {/* Time Casa */}
+                      <div className="flex items-center gap-2 sm:gap-3 justify-end flex-1 min-w-0">
+                        <span className="text-white font-bold text-sm sm:text-base truncate order-1 sm:order-1">
+                          {m.team_home}
+                        </span>
+                        <FlagEmoji
+                          emoji={homeFlag}
+                          title={m.team_home}
+                          size={28}
+                          className="order-2 sm:order-2 drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+                        />
+                      </div>
 
-                    <div className="flex items-center gap-3 bg-black/60 px-5 py-2.5 rounded-xl border border-red-900/30">
-                      <span className="text-white font-black text-2xl px-2">
-                        {m.home_score ?? 0}
-                      </span>
-                      <span className="text-amber-500 font-black text-lg">
-                        -
-                      </span>
-                      <span className="text-white font-black text-2xl px-2">
-                        {m.away_score ?? 0}
-                      </span>
-                    </div>
+                      {/* Placar Real */}
+                      <div className="flex items-center gap-2 sm:gap-3 bg-black/60 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border border-red-900/30 shrink-0">
+                        <span className="text-white font-black text-lg sm:text-2xl px-1 sm:px-2">
+                          {m.home_score ?? 0}
+                        </span>
+                        <span className="text-amber-500 font-black text-sm sm:text-lg">
+                          -
+                        </span>
+                        <span className="text-white font-black text-lg sm:text-2xl px-1 sm:px-2">
+                          {m.away_score ?? 0}
+                        </span>
+                      </div>
 
-                    <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <FlagEmoji
-                        emoji={awayFlag}
-                        title={m.team_away}
-                        size={32}
-                        className="drop-shadow-sm"
-                      />
-                      <span className="text-white font-bold text-base">
-                        {m.team_away}
-                      </span>
+                      {/* Time Fora */}
+                      <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
+                        <FlagEmoji
+                          emoji={awayFlag}
+                          title={m.team_away}
+                          size={28}
+                          className="drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+                        />
+                        <span className="text-white font-bold text-sm sm:text-base truncate">
+                          {m.team_away}
+                        </span>
+                      </div>
                     </div>
 
                     <GuessDisplay guess={guess} />
@@ -138,41 +144,47 @@ export default async function MatchesPage() {
                     </span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
-                      <span className="text-white font-bold text-base order-1 sm:order-1">
-                        {m.team_home}
-                      </span>
-                      <FlagEmoji
-                        emoji={homeFlag}
-                        title={m.team_home}
-                        size={32}
-                        className="order-2 sm:order-2 drop-shadow-sm"
-                      />
-                    </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+                    {/* Match Row (Always Horizontal) */}
+                    <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-6">
+                      {/* Time Casa */}
+                      <div className="flex items-center gap-2 sm:gap-3 justify-end flex-1 min-w-0">
+                        <span className="text-white font-bold text-sm sm:text-base truncate order-1 sm:order-1">
+                          {m.team_home}
+                        </span>
+                        <FlagEmoji
+                          emoji={homeFlag}
+                          title={m.team_home}
+                          size={28}
+                          className="order-2 sm:order-2 drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+                        />
+                      </div>
 
-                    <div className="flex items-center gap-3 bg-black/40 px-5 py-2.5 rounded-xl border border-gray-800">
-                      <span className="text-white font-extrabold text-2xl px-2">
-                        {m.home_score}
-                      </span>
-                      <span className="text-gray-500 font-black text-lg">
-                        x
-                      </span>
-                      <span className="text-white font-extrabold text-2xl px-2">
-                        {m.away_score}
-                      </span>
-                    </div>
+                      {/* Placar Real */}
+                      <div className="flex items-center gap-2 sm:gap-3 bg-black/40 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border border-gray-800 shrink-0">
+                        <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
+                          {m.home_score}
+                        </span>
+                        <span className="text-gray-500 font-black text-sm sm:text-lg">
+                          x
+                        </span>
+                        <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
+                          {m.away_score}
+                        </span>
+                      </div>
 
-                    <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <FlagEmoji
-                        emoji={awayFlag}
-                        title={m.team_away}
-                        size={32}
-                        className="drop-shadow-sm"
-                      />
-                      <span className="text-white font-bold text-base">
-                        {m.team_away}
-                      </span>
+                      {/* Time Fora */}
+                      <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
+                        <FlagEmoji
+                          emoji={awayFlag}
+                          title={m.team_away}
+                          size={28}
+                          className="drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+                        />
+                        <span className="text-white font-bold text-sm sm:text-base truncate">
+                          {m.team_away}
+                        </span>
+                      </div>
                     </div>
 
                     <GuessDisplay guess={guess} showPoints />
@@ -193,41 +205,47 @@ export default async function MatchesPage() {
                     </span>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
-                    <div className="flex items-center gap-3 justify-end flex-1 w-full sm:w-auto">
-                      <span className="text-white font-bold text-base order-1 sm:order-1">
-                        {m.team_home}
-                      </span>
-                      <FlagEmoji
-                        emoji={homeFlag}
-                        title={m.team_home}
-                        size={32}
-                        className="order-2 sm:order-2 drop-shadow-sm"
-                      />
-                    </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
+                    {/* Match Row (Always Horizontal) */}
+                    <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-6">
+                      {/* Time Casa */}
+                      <div className="flex items-center gap-2 sm:gap-3 justify-end flex-1 min-w-0">
+                        <span className="text-white font-bold text-sm sm:text-base truncate order-1 sm:order-1">
+                          {m.team_home}
+                        </span>
+                        <FlagEmoji
+                          emoji={homeFlag}
+                          title={m.team_home}
+                          size={28}
+                          className="order-2 sm:order-2 drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+                        />
+                      </div>
 
-                    <div className="flex items-center gap-3 bg-black/40 px-5 py-2.5 rounded-xl border border-gray-800">
-                      <span className="text-white font-extrabold text-2xl px-2">
-                        {m.home_score}
-                      </span>
-                      <span className="text-gray-500 font-black text-lg">
-                        x
-                      </span>
-                      <span className="text-white font-extrabold text-2xl px-2">
-                        {m.away_score}
-                      </span>
-                    </div>
+                      {/* Placar Real */}
+                      <div className="flex items-center gap-2 sm:gap-3 bg-black/40 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border border-gray-800 shrink-0">
+                        <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
+                          {m.home_score}
+                        </span>
+                        <span className="text-gray-500 font-black text-sm sm:text-lg">
+                          x
+                        </span>
+                        <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
+                          {m.away_score}
+                        </span>
+                      </div>
 
-                    <div className="flex items-center gap-3 justify-start flex-1 w-full sm:w-auto">
-                      <FlagEmoji
-                        emoji={awayFlag}
-                        title={m.team_away}
-                        size={32}
-                        className="drop-shadow-sm"
-                      />
-                      <span className="text-white font-bold text-base">
-                        {m.team_away}
-                      </span>
+                      {/* Time Fora */}
+                      <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
+                        <FlagEmoji
+                          emoji={awayFlag}
+                          title={m.team_away}
+                          size={28}
+                          className="drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+                        />
+                        <span className="text-white font-bold text-sm sm:text-base truncate">
+                          {m.team_away}
+                        </span>
+                      </div>
                     </div>
 
                     <GuessDisplay guess={guess} />
