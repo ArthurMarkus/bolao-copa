@@ -30,3 +30,7 @@ input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
+
+main {
+  padding-bottom: max(6rem, env(safe-area-inset-bottom));
+}

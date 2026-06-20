@@ -84,7 +84,7 @@ export default async function RankingPage() {
                 🎯 {mostPerfect.name}
               </h2>
               <p className="text-gray-400 text-sm mt-1 font-semibold">
-                {mostPerfect.count} placares exatos
+                {mostPerfect.count} placares perfeitos
               </p>
             </div>
           )}
@@ -102,7 +102,7 @@ export default async function RankingPage() {
                 😬 {leastCorrect.name}
               </h2>
               <p className="text-gray-400 text-sm mt-1 font-semibold">
-                {leastCorrect.count} erros seguidos
+                {leastCorrect.count} palpites errados
               </p>
             </div>
           )}
