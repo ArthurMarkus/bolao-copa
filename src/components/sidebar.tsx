@@ -35,7 +35,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar (hidden on mobile) */}
-      <aside className="hidden md:flex w-64 h-screen sticky top-0 bg-gradient-to-b from-gray-950 to-black border-r border-white/[0.06] flex-col justify-between shrink-0 select-none">
+      <aside className="hidden md:flex w-64 h-screen fixed top-0 left-0 bg-gradient-to-b from-gray-950 to-black border-r border-white/[0.06] flex-col justify-between shrink-0 select-none">
         <div className="flex flex-col flex-1">
           {/* Brand Header */}
           <div className="p-6 border-b border-white/[0.06] flex items-center gap-3">
