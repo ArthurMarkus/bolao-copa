@@ -116,14 +116,14 @@ export default function Sidebar() {
       </header>
 
       {/* Mobile Bottom Navigation Bar (hidden on desktop) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black via-gray-950 to-gray-950 border-t border-white/[0.06] backdrop-blur-md flex items-center justify-around px-6 z-50 select-none">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[calc(4rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] bg-gradient-to-t from-black via-gray-950 to-gray-950 border-t border-white/[0.06] backdrop-blur-md flex items-center justify-around px-6 z-50 select-none">
         {links.map(link => {
           const isActive = pathname === link.href
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={`flex flex-col items-center justify-center w-24 h-full transition-all duration-200 ${
+              className={`flex flex-col items-center justify-center w-24 h-16 transition-all duration-200 ${
                 isActive
                   ? "text-emerald-400 font-bold"
                   : "text-gray-400 font-medium"
