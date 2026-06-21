@@ -29,7 +29,7 @@ export default async function RankingPage() {
   ]);
 
   return (
-    <div className="relative max-w-4xl mx-auto px-4 py-2">
+    <div className="relative max-w-4xl mx-auto px-4 py-2 overflow-x-hidden">
       {/* Background World Cup Aura Gradients */}
       <div className="absolute top-0 right-0 -z-10 w-[350px] h-[350px] rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none" />
       <div className="absolute top-1/3 left-0 -z-10 w-[400px] h-[400px] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
