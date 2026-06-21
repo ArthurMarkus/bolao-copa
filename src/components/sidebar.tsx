@@ -90,53 +90,56 @@ export default function Sidebar() {
         </div>
       </aside>
 
-      {/* Mobile Top Header (hidden on desktop) */}
-      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-black/60 backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-4 z-50 select-none">
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex items-center justify-center bg-gradient-to-br from-emerald-500/20 to-amber-500/20 text-lg w-8 h-8 rounded-lg border border-emerald-500/20 shadow-md">
-            🏆
+      {/* Mobile Layout Wrapper (hidden on desktop to avoid flexbox layout bugs with fixed elements) */}
+      <div className="md:hidden">
+        {/* Mobile Top Header */}
+        <header className="fixed top-0 left-0 right-0 h-16 bg-black/60 backdrop-blur-md border-b border-white/[0.06] flex items-center justify-between px-4 z-50 select-none">
+          <div className="flex items-center gap-2.5">
+            <div className="relative flex items-center justify-center bg-gradient-to-br from-emerald-500/20 to-amber-500/20 text-lg w-8 h-8 rounded-lg border border-emerald-500/20 shadow-md">
+              🏆
+            </div>
+            <div>
+              <h1 className="text-white font-black text-xs tracking-wide bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">
+                BOLÃO DA COPA
+              </h1>
+              <p className="text-[8px] text-gray-500 font-bold uppercase tracking-wider">Mundial 2026</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-white font-black text-xs tracking-wide bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">
-              BOLÃO DA COPA
-            </h1>
-            <p className="text-[8px] text-gray-500 font-bold uppercase tracking-wider">Mundial 2026</p>
-          </div>
-        </div>
 
-        <button
-          onClick={handleLogout}
-          className="p-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/5 border border-transparent hover:border-red-500/10 transition-all duration-200 cursor-pointer"
-          title="Sair"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-        </button>
-      </header>
+          <button
+            onClick={handleLogout}
+            className="p-2 rounded-xl text-gray-400 hover:text-red-400 hover:bg-red-500/5 border border-transparent hover:border-red-500/10 transition-all duration-200 cursor-pointer"
+            title="Sair"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2.2" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
+        </header>
 
-      {/* Mobile Bottom Navigation Bar (hidden on desktop) */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[calc(4rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] bg-gradient-to-t from-black via-gray-950 to-gray-950 border-t border-white/[0.06] backdrop-blur-md flex items-center justify-around px-6 z-50 select-none">
-        {links.map(link => {
-          const isActive = pathname === link.href
-          return (
-            <Link
-              key={link.href}
-              href={link.href}
-              className={`flex flex-col items-center justify-center w-24 h-16 transition-all duration-200 ${
-                isActive
-                  ? "text-emerald-400 font-bold"
-                  : "text-gray-400 font-medium"
-              }`}
-            >
-              <span className={`mb-1 transition-colors duration-200 ${isActive ? "text-emerald-400 scale-105" : "text-gray-500"}`}>
-                {link.icon}
-              </span>
-              <span className="text-[10px] tracking-wide">{link.label}</span>
-            </Link>
-          )
-        })}
-      </nav>
+        {/* Mobile Bottom Navigation Bar */}
+        <nav className="fixed bottom-0 left-0 right-0 h-[calc(4rem+env(safe-area-inset-bottom))] pb-[env(safe-area-inset-bottom)] bg-gradient-to-t from-black via-gray-950 to-gray-950 border-t border-white/[0.06] backdrop-blur-md flex items-center justify-around px-6 z-50 select-none">
+          {links.map(link => {
+            const isActive = pathname === link.href
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`flex flex-col items-center justify-center w-24 h-16 transition-all duration-200 ${
+                  isActive
+                    ? "text-emerald-400 font-bold"
+                    : "text-gray-400 font-medium"
+                }`}
+              >
+                <span className={`mb-1 transition-colors duration-200 ${isActive ? "text-emerald-400 scale-105" : "text-gray-500"}`}>
+                  {link.icon}
+                </span>
+                <span className="text-[10px] tracking-wide">{link.label}</span>
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
     </>
   )
 }
