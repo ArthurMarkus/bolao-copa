@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth";
 import { saveGuess } from "@/services/guess.service";
-import { getMatches } from "@/lib/worldcup-api";
-import { findGuessesByUser } from "@/repositories/guess.repository";
+import { getMatches, getMatchById } from "@/lib/worldcup-api";
+import { findGuessesByUser, findGuessesWithUserNamesByMatch } from "@/repositories/guess.repository";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -12,16 +12,43 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const userIdStr = searchParams.get('userId')
-    if (!userIdStr) {
-        return NextResponse.json({ error: 'userId obrigatório' }, { status: 400 })
-    }
+    const matchIdStr = searchParams.get('matchId')
 
-    const userId = Number(userIdStr)
-    if (isNaN(userId)) {
-        return NextResponse.json({ error: 'userId inválido' }, { status: 400 })
+    if (!userIdStr && !matchIdStr) {
+        return NextResponse.json({ error: 'userId ou matchId obrigatório' }, { status: 400 })
     }
 
     try {
+        if (matchIdStr) {
+            const matchId = Number(matchIdStr)
+            if (isNaN(matchId)) {
+                return NextResponse.json({ error: 'matchId inválido' }, { status: 400 })
+            }
+
+            const match = await getMatchById(matchId)
+            if (!match) {
+                return NextResponse.json({ error: 'Partida não encontrada' }, { status: 404 })
+            }
+
+            const guesses = await findGuessesWithUserNamesByMatch(matchId)
+
+            // Filtra palpites de outros usuários se o status for TIMED
+            const isMatchTimed = match.status === "TIMED"
+            const filteredGuesses = guesses.filter(g => {
+                if (isMatchTimed) {
+                    return g.user_id === session.userId
+                }
+                return true
+            })
+
+            return NextResponse.json(filteredGuesses)
+        }
+
+        const userId = Number(userIdStr!)
+        if (isNaN(userId)) {
+            return NextResponse.json({ error: 'userId inválido' }, { status: 400 })
+        }
+
         const [matches, guesses] = await Promise.all([
             getMatches(),
             findGuessesByUser(userId)
@@ -32,12 +59,15 @@ export async function GET(req: NextRequest) {
             (m) => m.team_home !== "A definir" && m.team_away !== "A definir"
         )
 
+        const isOwnGuesses = userId === session.userId
+
         // Mescla detalhes das partidas com os palpites do usuário
         const data = confirmedMatches.map(m => {
             const guess = guesses.find(g => g.match_id === m.id_match)
+            const showGuess = isOwnGuesses || m.status !== "TIMED"
             return {
                 ...m,
-                guess: guess ? {
+                guess: (guess && showGuess) ? {
                     home_score: guess.home_score,
                     away_score: guess.away_score,
                     points: guess.points

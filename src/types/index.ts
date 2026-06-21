@@ -17,8 +17,19 @@ export type Guess = {
   points: number;
 };
 
+export type MatchGuessWithUser = {
+  id: number;
+  user_id: number;
+  user_name: string;
+  match_id: number;
+  home_score: number;
+  away_score: number;
+  points: number;
+};
+
 export type RankingEntry = {
   user_id: number;
   name: string;
   total_points: number;
 };
+

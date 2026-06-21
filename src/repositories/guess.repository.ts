@@ -1,5 +1,5 @@
 import { db } from '@/lib/db';
-import { Guess, RankingEntry } from '@/types';
+import { Guess, MatchGuessWithUser, RankingEntry } from '@/types';
 
 export async function upsertGuess(userId: number, matchId: number, homeScore: number, awayScore: number): Promise<Guess> {
     const { rows } = await db.query(`
@@ -36,6 +36,26 @@ export async function findGuessesByUser(userId: number): Promise<Guess[]> {
     )
     return rows
 }
+
+export async function findAllGuessesWithUserNames(): Promise<MatchGuessWithUser[]> {
+    const { rows } = await db.query(`
+        SELECT g.id, g.user_id, u.name as user_name, g.match_id, g.home_score, g.away_score, g.points
+        FROM guesses g
+        JOIN users u ON u.id = g.user_id
+    `)
+    return rows
+}
+
+export async function findGuessesWithUserNamesByMatch(matchId: number): Promise<MatchGuessWithUser[]> {
+    const { rows } = await db.query(`
+        SELECT g.id, g.user_id, u.name as user_name, g.match_id, g.home_score, g.away_score, g.points
+        FROM guesses g
+        JOIN users u ON u.id = g.user_id
+        WHERE g.match_id = $1
+    `, [matchId])
+    return rows
+}
+
 
 export async function updateGuessPoints(guessId: number, points: number) {
     await db.query('UPDATE guesses SET points = $1 WHERE id = $2', [points, guessId])
