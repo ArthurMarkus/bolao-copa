@@ -29,79 +29,77 @@ export default async function RankingPage() {
   ]);
 
   return (
-    <div className="relative max-w-4xl mx-auto px-4 py-2 overflow-x-hidden">
-      {/* Background World Cup Aura Gradients */}
-      <div className="absolute top-0 right-0 -z-10 w-[350px] h-[350px] rounded-full bg-emerald-500/10 blur-[100px] pointer-events-none" />
-      <div className="absolute top-1/3 left-0 -z-10 w-[400px] h-[400px] rounded-full bg-amber-500/5 blur-[120px] pointer-events-none" />
-
-      {/* Header Section */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="flex items-center justify-center bg-amber-500/10 text-amber-500 p-2.5 rounded-2xl border border-amber-500/20 text-2xl shadow-lg shadow-amber-500/5">
-            🏆
-          </span>
-          <div>
-            <span className="text-[10px] font-bold tracking-widest text-amber-500 uppercase">
-              Classificação Geral
-            </span>
-            <h1 className="text-white text-3xl font-extrabold tracking-tight">
-              Tabela de Líderes
-            </h1>
-          </div>
-        </div>
+    <div className="relative max-w-3xl mx-auto px-4 py-2 overflow-x-hidden">
+      {/* Header */}
+      <div className="mb-8">
+        <span className="text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+          Classificação Geral
+        </span>
+        <h1 className="text-2xl font-bold tracking-tight mt-0.5" style={{ color: 'var(--text-primary)' }}>
+          Tabela de Líderes
+        </h1>
       </div>
 
       {(mostCorrect || mostPerfect || leastCorrect) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          {/* Card 1: Mais Acertos */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-8">
+          {/* Mais Acertos */}
           {mostCorrect && (
-            <div className="bg-gradient-to-br from-amber-500/10 to-transparent backdrop-blur-md rounded-2xl border border-amber-500/20 p-5 shadow-lg shadow-amber-500/5 relative overflow-hidden group hover:border-amber-500/35 transition-all duration-300">
-              <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-amber-500/5 font-black select-none pointer-events-none">
-                🎯
-              </div>
-              <p className="text-xs text-amber-500 font-bold uppercase tracking-wider">
+            <div
+              className="rounded-lg p-4 transition-all duration-200"
+              style={{
+                background: 'rgba(212, 168, 67, 0.04)',
+                border: '1px solid rgba(212, 168, 67, 0.15)',
+              }}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--rank-1)' }}>
                 Mais Acertos
               </p>
-              <h2 className="text-white text-xl font-bold mt-2 truncate flex items-center gap-1.5">
-                🏅 {mostCorrect.name}
+              <h2 className="text-base font-bold mt-1.5 truncate" style={{ color: 'var(--text-primary)' }}>
+                {mostCorrect.name}
               </h2>
-              <p className="text-gray-400 text-sm mt-1 font-semibold">
+              <p className="text-sm mt-0.5 font-medium" style={{ color: 'var(--text-muted)' }}>
                 {mostCorrect.count} palpites certos
               </p>
             </div>
           )}
 
-          {/* Card 2: Mais Placares Perfeitos */}
+          {/* Mais Placares Perfeitos */}
           {mostPerfect && (
-            <div className="bg-gradient-to-br from-emerald-500/10 to-transparent backdrop-blur-md rounded-2xl border border-emerald-500/20 p-5 shadow-lg shadow-emerald-500/5 relative overflow-hidden group hover:border-emerald-500/35 transition-all duration-300">
-              <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-emerald-500/5 font-black select-none pointer-events-none">
-                ⭐
-              </div>
-              <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider">
-                Mais Placares Perfeitos
+            <div
+              className="rounded-lg p-4 transition-all duration-200"
+              style={{
+                background: 'rgba(34, 160, 101, 0.04)',
+                border: '1px solid rgba(34, 160, 101, 0.15)',
+              }}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--open)' }}>
+                Placares Perfeitos
               </p>
-              <h2 className="text-white text-xl font-bold mt-2 truncate flex items-center gap-1.5">
-                🎯 {mostPerfect.name}
+              <h2 className="text-base font-bold mt-1.5 truncate" style={{ color: 'var(--text-primary)' }}>
+                {mostPerfect.name}
               </h2>
-              <p className="text-gray-400 text-sm mt-1 font-semibold">
-                {mostPerfect.count} placares perfeitos
+              <p className="text-sm mt-0.5 font-medium" style={{ color: 'var(--text-muted)' }}>
+                {mostPerfect.count} placares exatos
               </p>
             </div>
           )}
 
-          {/* Card 3: Menos Acertos */}
+          {/* Menos Acertos */}
           {leastCorrect && (
-            <div className="bg-gradient-to-br from-red-500/10 to-transparent backdrop-blur-md rounded-2xl border border-red-500/20 p-5 shadow-lg shadow-red-500/5 relative overflow-hidden group hover:border-red-500/35 transition-all duration-300">
-              <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-red-500/5 font-black select-none pointer-events-none">
-                💀
-              </div>
-              <p className="text-xs text-red-500 font-bold uppercase tracking-wider">
+            <div
+              className="rounded-lg p-4 transition-all duration-200"
+              style={{
+                background: 'rgba(224, 49, 49, 0.03)',
+                border: '1px solid rgba(224, 49, 49, 0.12)',
+              }}
+            >
+              <p className="text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--accent)' }}>
                 Menos Acertos
               </p>
-              <h2 className="text-white text-xl font-bold mt-2 truncate flex items-center gap-1.5">
-                😬 {leastCorrect.name}
+              <h2 className="text-base font-bold mt-1.5 truncate" style={{ color: 'var(--text-primary)' }}>
+                {leastCorrect.name}
               </h2>
-              <p className="text-gray-400 text-sm mt-1 font-semibold">
+              <p className="text-sm mt-0.5 font-medium" style={{ color: 'var(--text-muted)' }}>
                 {leastCorrect.count} palpites errados
               </p>
             </div>

@@ -4,6 +4,8 @@ export type Match = {
   team_away: string;
   home_score: number | null;
   away_score: number | null;
+  home_crest: string | null;
+  away_crest: string | null;
   date: Date;
   status: "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED";
 };

@@ -1,6 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
+import { toast } from "sonner"
 
 export default function LoginPage() {
   const [name, setName] = useState("")
@@ -51,7 +52,7 @@ export default function LoginPage() {
         setError("")
         setName("")
         setPassword("")
-        alert("Conta criada com sucesso! Faça login.")
+        toast.success("Conta criada com sucesso! Faça login.")
       } else {
         setError("Erro ao criar conta. Talvez o nome já esteja em uso.")
       }
@@ -68,94 +69,147 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background World Cup Aura Gradients */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 -z-10 w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] rounded-full bg-emerald-500/10 blur-[130px] pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 -z-10 w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] rounded-full bg-amber-500/10 blur-[130px] pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden" style={{ background: 'var(--bg-primary)' }}>
+      {/* Subtle background accent */}
+      <div
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{
+          background: 'radial-gradient(circle, rgba(224, 49, 49, 0.03) 0%, transparent 70%)',
+        }}
+      />
 
-      <div className="bg-white/[0.02] backdrop-blur-xl rounded-3xl border border-white/[0.08] p-8 w-full max-w-md shadow-2xl relative overflow-hidden">
-        {/* Top Accent Line */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-amber-500 to-emerald-500" />
-        
+      <div className="w-full max-w-sm relative">
+        {/* Brand */}
         <div className="text-center mb-8">
-          <div className="relative inline-flex items-center justify-center bg-gradient-to-br from-emerald-500/20 to-amber-500/20 text-4xl p-4 rounded-2xl border border-emerald-500/30 shadow-lg shadow-emerald-500/5 mb-4 group hover:scale-105 transition-transform duration-300">
-            🏆
+          <div
+            className="inline-flex items-center justify-center w-12 h-12 rounded-xl font-extrabold text-lg mb-4"
+            style={{
+              background: 'var(--accent-subtle)',
+              border: '1px solid var(--accent-border)',
+              color: 'var(--accent)',
+            }}
+          >
+            BC
           </div>
-          <h1 className="text-white text-3xl font-extrabold tracking-tight bg-gradient-to-r from-emerald-400 via-amber-400 to-emerald-400 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
             Bolão da Copa
           </h1>
-          <p className="text-gray-400 text-sm mt-2 font-medium">
-            Seu palpite pode valer o título!
+          <p className="text-sm mt-1.5" style={{ color: 'var(--text-muted)' }}>
+            Entre com sua conta para continuar
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Campo Nome */}
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </span>
-            <input
-              placeholder="Seu nome de usuário"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              disabled={isLoading}
-              className="w-full bg-white/[0.03] text-white placeholder-gray-500 rounded-xl border border-white/10 pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-50"
-              required
-            />
-          </div>
-
-          {/* Campo Senha */}
-          <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-gray-500">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-            </span>
-            <input
-              type="password"
-              placeholder="Sua senha secreta"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              disabled={isLoading}
-              className="w-full bg-white/[0.03] text-white placeholder-gray-500 rounded-xl border border-white/10 pl-12 pr-4 py-3.5 text-sm focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all disabled:opacity-50"
-              required
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-xs py-2.5 px-4 rounded-xl text-center font-semibold">
-              ⚠️ {error}
-            </div>
-          )}
-
-          <div className="space-y-3 pt-2">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-gradient-to-r from-emerald-500 to-amber-500 hover:from-emerald-400 hover:to-amber-400 text-black font-extrabold rounded-xl py-3.5 shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/25 transition-all hover:scale-[1.01] active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:pointer-events-none text-sm"
-            >
-              {isLoading ? "Entrando..." : "Entrar no Bolão"}
-            </button>
-
-            <div className="relative flex py-2 items-center text-xs text-gray-500">
-              <div className="flex-grow border-t border-white/5"></div>
-              <span className="flex-shrink mx-4">não tem conta?</span>
-              <div className="flex-grow border-t border-white/5"></div>
+        {/* Form Card */}
+        <div
+          className="rounded-xl p-6"
+          style={{
+            background: 'var(--bg-secondary)',
+            border: '1px solid var(--border)',
+          }}
+        >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* Name */}
+            <div>
+              <label className="block text-[11px] font-medium uppercase tracking-wide mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                Usuário
+              </label>
+              <input
+                placeholder="Seu nome de usuário"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                disabled={isLoading}
+                className="w-full rounded-lg px-3.5 py-3 text-sm focus:outline-none focus:ring-2 transition-all disabled:opacity-50"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-hover)',
+                  // @ts-ignore
+                  '--tw-ring-color': 'var(--accent)',
+                }}
+                required
+              />
             </div>
 
-            <button
-              type="button"
-              onClick={handleRegister}
-              disabled={isLoading}
-              className="w-full bg-white/5 hover:bg-white/10 text-gray-300 font-bold rounded-xl py-3.5 border border-white/10 hover:border-white/20 transition-all active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:pointer-events-none text-sm"
-            >
-              Criar minha conta
-            </button>
-          </div>
-        </form>
+            {/* Password */}
+            <div>
+              <label className="block text-[11px] font-medium uppercase tracking-wide mb-1.5" style={{ color: 'var(--text-muted)' }}>
+                Senha
+              </label>
+              <input
+                type="password"
+                placeholder="Sua senha"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                disabled={isLoading}
+                className="w-full rounded-lg px-3.5 py-3 text-sm focus:outline-none focus:ring-2 transition-all disabled:opacity-50"
+                style={{
+                  background: 'rgba(255,255,255,0.03)',
+                  color: 'var(--text-primary)',
+                  border: '1px solid var(--border-hover)',
+                  // @ts-ignore
+                  '--tw-ring-color': 'var(--accent)',
+                }}
+                required
+              />
+            </div>
+
+            {error && (
+              <div
+                className="text-xs py-2.5 px-4 rounded-lg text-center font-medium"
+                style={{
+                  background: 'var(--live-bg)',
+                  border: '1px solid var(--live-border)',
+                  color: 'var(--live)',
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-3 pt-1">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full font-semibold rounded-lg py-3 transition-all duration-200 cursor-pointer disabled:opacity-50 disabled:pointer-events-none text-sm active:scale-[0.99]"
+                style={{
+                  background: 'var(--accent)',
+                  color: '#fff',
+                  border: '1px solid var(--accent)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.9'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
+              >
+                {isLoading ? "Entrando..." : "Entrar"}
+              </button>
+
+              <div className="relative flex py-2 items-center text-xs" style={{ color: 'var(--text-muted)' }}>
+                <div className="flex-grow" style={{ borderTop: '1px solid var(--border)' }}></div>
+                <span className="flex-shrink mx-4 text-[11px]">ou</span>
+                <div className="flex-grow" style={{ borderTop: '1px solid var(--border)' }}></div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleRegister}
+                disabled={isLoading}
+                className="w-full font-medium rounded-lg py-3 transition-all active:scale-[0.99] cursor-pointer disabled:opacity-50 disabled:pointer-events-none text-sm"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border-hover)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.06)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.04)'; }}
+              >
+                Criar conta
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <p className="text-center text-[11px] mt-6" style={{ color: 'var(--text-muted)' }}>
+          Mundial 2026
+        </p>
       </div>
     </div>
   )

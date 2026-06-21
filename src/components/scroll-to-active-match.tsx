@@ -13,21 +13,11 @@ export default function ScrollToActiveMatch({ matchId }: ScrollToActiveMatchProp
       if (element) {
         element.scrollIntoView({ behavior: "smooth", block: "center" })
 
-        // Efeito visual suave de destaque temporário
-        element.classList.add(
-          "ring-2",
-          "ring-amber-500/50",
-          "shadow-xl",
-          "shadow-amber-500/10"
-        )
+        // Subtle highlight effect using CSS variables
+        element.style.boxShadow = '0 0 0 1px var(--accent), 0 4px 20px rgba(224, 49, 49, 0.08)'
 
         const removeTimer = setTimeout(() => {
-          element.classList.remove(
-            "ring-2",
-            "ring-amber-500/50",
-            "shadow-xl",
-            "shadow-amber-500/10"
-          )
+          element.style.boxShadow = ''
         }, 2500)
 
         return () => clearTimeout(removeTimer)

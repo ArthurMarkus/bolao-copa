@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import FlagEmoji from "@/components/flag-emoji";
-import { getFlagEmoji } from "@/lib/flags";
+import TeamCrest from "@/components/team-crest";
 import { RankingEntry } from "@/types";
 
 type RankingListProps = {
@@ -42,23 +41,52 @@ export default function RankingList({ ranking }: RankingListProps) {
     fetchGuesses();
   }, [selectedUser]);
 
+  function getRankStyle(index: number) {
+    if (index === 0) return {
+      bg: 'rgba(212, 168, 67, 0.06)',
+      border: 'rgba(212, 168, 67, 0.2)',
+      rankColor: 'var(--rank-1)',
+      avatarBg: 'rgba(212, 168, 67, 0.1)',
+      avatarBorder: 'rgba(212, 168, 67, 0.3)',
+    };
+    if (index === 1) return {
+      bg: 'rgba(156, 163, 175, 0.04)',
+      border: 'rgba(156, 163, 175, 0.15)',
+      rankColor: 'var(--rank-2)',
+      avatarBg: 'rgba(156, 163, 175, 0.08)',
+      avatarBorder: 'rgba(156, 163, 175, 0.2)',
+    };
+    if (index === 2) return {
+      bg: 'rgba(184, 115, 51, 0.05)',
+      border: 'rgba(184, 115, 51, 0.15)',
+      rankColor: 'var(--rank-3)',
+      avatarBg: 'rgba(184, 115, 51, 0.08)',
+      avatarBorder: 'rgba(184, 115, 51, 0.2)',
+    };
+    return {
+      bg: 'var(--bg-secondary)',
+      border: 'var(--border)',
+      rankColor: 'var(--text-muted)',
+      avatarBg: 'rgba(255,255,255,0.04)',
+      avatarBorder: 'var(--border)',
+    };
+  }
+
   return (
     <>
-      <div className="space-y-3">
+      <div className="space-y-2">
         {ranking.length === 0 ? (
-          <div className="bg-white/[0.02] backdrop-blur-md border border-white/[0.06] rounded-2xl p-12 text-center">
-            <p className="text-gray-400 text-base">
+          <div
+            className="rounded-lg p-12 text-center"
+            style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)' }}
+          >
+            <p style={{ color: 'var(--text-muted)' }}>
               Nenhum jogador pontuou ainda. Os palpites começarão a valer assim
-              que os jogos iniciarem!
+              que os jogos iniciarem.
             </p>
           </div>
         ) : (
           ranking.map((entry, index) => {
-            const isFirst = index === 0;
-            const isSecond = index === 1;
-            const isThird = index === 2;
-
-            // Generate initials
             const initials = entry.name
               ? entry.name
                   .split(" ")
@@ -69,40 +97,7 @@ export default function RankingList({ ranking }: RankingListProps) {
                   .toUpperCase()
               : "?";
 
-            // Position badges
-            let positionBadge = null;
-            let cardStyle =
-              "bg-white/[0.01] hover:bg-white/[0.03] border-white/[0.06] hover:border-white/[0.1] text-gray-300";
-            let rankColorClass = "text-gray-400";
-            let pointsStyle = "text-white font-bold";
-            let avatarBorder = "border-white/10 bg-white/5";
-
-            if (isFirst) {
-              positionBadge = "🥇";
-              cardStyle =
-                "bg-gradient-to-r from-amber-500/12 via-amber-500/5 to-transparent border-amber-500/40 hover:border-amber-500/60 shadow-lg shadow-amber-500/5";
-              rankColorClass = "text-amber-400 font-black text-2xl";
-              pointsStyle =
-                "text-amber-400 font-black text-xl drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]";
-              avatarBorder =
-                "border-amber-500/50 bg-amber-500/10 text-amber-300";
-            } else if (isSecond) {
-              positionBadge = "🥈";
-              cardStyle =
-                "bg-gradient-to-r from-slate-400/12 via-slate-400/5 to-transparent border-slate-400/30 hover:border-slate-400/50 shadow-md shadow-slate-400/5";
-              rankColorClass = "text-slate-300 font-black text-2xl";
-              pointsStyle = "text-slate-300 font-extrabold text-xl";
-              avatarBorder =
-                "border-slate-400/40 bg-slate-400/10 text-slate-300";
-            } else if (isThird) {
-              positionBadge = "🥉";
-              cardStyle =
-                "bg-gradient-to-r from-amber-700/12 via-amber-700/5 to-transparent border-amber-700/30 hover:border-amber-700/50 shadow-md shadow-amber-700/5";
-              rankColorClass = "text-amber-600 font-black text-2xl";
-              pointsStyle = "text-amber-600 font-extrabold text-xl";
-              avatarBorder =
-                "border-amber-700/40 bg-amber-700/10 text-amber-600";
-            }
+            const style = getRankStyle(index);
 
             return (
               <div
@@ -110,51 +105,67 @@ export default function RankingList({ ranking }: RankingListProps) {
                 onClick={() =>
                   setSelectedUser({ id: entry.user_id, name: entry.name })
                 }
-                className={`flex items-center gap-4 sm:gap-6 rounded-2xl border p-4 sm:p-5 transition-all duration-300 hover:-translate-y-0.5 cursor-pointer ${cardStyle}`}
+                className="flex items-center gap-4 sm:gap-5 rounded-lg p-4 sm:p-5 transition-all duration-200 cursor-pointer hover:translate-y-[-1px]"
+                style={{
+                  background: style.bg,
+                  border: `1px solid ${style.border}`,
+                }}
               >
-                {/* Ranking Position */}
-                <div className="flex items-center justify-center w-10 sm:w-12 text-center">
-                  {positionBadge ? (
-                    <span className="text-3xl filter drop-shadow-sm select-none">
-                      {positionBadge}
-                    </span>
-                  ) : (
-                    <span className={`text-base font-bold ${rankColorClass}`}>
-                      {index + 1}
-                    </span>
-                  )}
+                {/* Rank */}
+                <div className="flex items-center justify-center w-10 sm:w-11 text-center">
+                  <span
+                    className={`font-bold ${index < 3 ? 'text-xl' : 'text-base'}`}
+                    style={{ color: style.rankColor, fontFamily: 'var(--font-mono)' }}
+                  >
+                    {index + 1}
+                  </span>
                 </div>
 
-                {/* Initial Avatar */}
+                {/* Avatar */}
                 <div
-                  className={`hidden sm:flex items-center justify-center w-11 h-11 rounded-full border font-bold text-sm ${avatarBorder}`}
+                  className="hidden sm:flex items-center justify-center w-10 h-10 rounded-full font-semibold text-sm"
+                  style={{
+                    background: style.avatarBg,
+                    border: `1px solid ${style.avatarBorder}`,
+                    color: style.rankColor,
+                  }}
                 >
                   {initials}
                 </div>
 
-                {/* User Info */}
+                {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`font-semibold text-base sm:text-lg truncate ${isFirst ? "text-white" : "text-gray-200"}`}
+                      className={`font-semibold text-base sm:text-lg truncate`}
+                      style={{ color: index === 0 ? 'var(--text-primary)' : 'var(--text-secondary)' }}
                     >
                       {entry.name}
                     </span>
-                    {isFirst && (
-                      <span className="bg-amber-500/15 text-amber-400 text-[10px] font-black uppercase px-2 py-0.5 rounded-full border border-amber-500/20 tracking-wider">
+                    {index === 0 && (
+                      <span
+                        className="text-[10px] font-bold uppercase px-2 py-0.5 rounded tracking-wide"
+                        style={{
+                          background: 'rgba(212, 168, 67, 0.1)',
+                          color: 'var(--rank-1)',
+                          border: '1px solid rgba(212, 168, 67, 0.2)',
+                        }}
+                      >
                         Líder
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Participante do Bolão ⚽
-                  </p>
                 </div>
 
-                {/* User Score */}
+                {/* Points */}
                 <div className="text-right">
-                  <span className={`${pointsStyle}`}>{entry.total_points}</span>
-                  <span className="text-[10px] sm:text-xs text-gray-400 uppercase font-semibold tracking-wider block sm:inline sm:ml-1">
+                  <span
+                    className={`font-bold ${index < 3 ? 'text-xl' : 'text-base'}`}
+                    style={{ color: style.rankColor, fontFamily: 'var(--font-mono)' }}
+                  >
+                    {entry.total_points}
+                  </span>
+                  <span className="text-[10px] sm:text-xs font-medium uppercase tracking-wide block sm:inline sm:ml-1" style={{ color: 'var(--text-muted)' }}>
                     pts
                   </span>
                 </div>
@@ -164,26 +175,35 @@ export default function RankingList({ ranking }: RankingListProps) {
         )}
       </div>
 
-      {/* Lazy Loaded Modal */}
+      {/* Modal */}
       {selectedUser && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-gradient-to-b from-gray-950 to-black border border-white/[0.08] rounded-3xl max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden animate-scale-up">
-            {/* Top Accent Line */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-emerald-500 via-amber-500 to-emerald-500" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(8px)' }}>
+          <div
+            className="max-w-2xl w-full max-h-[85vh] flex flex-col shadow-2xl relative overflow-hidden animate-scale-up rounded-xl"
+            style={{
+              background: 'var(--bg-secondary)',
+              border: '1px solid var(--border-hover)',
+            }}
+          >
+            {/* Top accent */}
+            <div className="h-[2px]" style={{ background: 'var(--accent)' }} />
 
-            {/* Modal Header */}
-            <div className="p-6 border-b border-white/[0.06] flex items-center justify-between">
+            {/* Header */}
+            <div className="p-5 flex items-center justify-between" style={{ borderBottom: '1px solid var(--border)' }}>
               <div>
-                <span className="text-[10px] font-bold tracking-widest text-amber-500 uppercase">
-                  Palpites do Participante
+                <span className="text-[10px] font-semibold tracking-wide uppercase" style={{ color: 'var(--text-muted)' }}>
+                  Palpites de
                 </span>
-                <h3 className="text-white text-xl font-extrabold tracking-tight mt-0.5">
-                  ⚽ {selectedUser.name}
+                <h3 className="text-lg font-bold tracking-tight mt-0.5" style={{ color: 'var(--text-primary)' }}>
+                  {selectedUser.name}
                 </h3>
               </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="text-gray-400 hover:text-white p-2 rounded-xl hover:bg-white/5 transition-all cursor-pointer"
+                className="p-2 rounded-lg transition-all cursor-pointer"
+                style={{ color: 'var(--text-muted)' }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
               >
                 <svg
                   className="w-5 h-5"
@@ -201,35 +221,46 @@ export default function RankingList({ ranking }: RankingListProps) {
               </button>
             </div>
 
-            {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+            {/* Body */}
+            <div className="flex-1 overflow-y-auto p-5 space-y-3">
               {loading && (
-                <div className="flex flex-col items-center justify-center py-20 space-y-4">
-                  <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin"></div>
-                  <p className="text-gray-400 text-sm font-medium animate-pulse">
-                    Buscando palpites no banco...
+                <div className="flex flex-col items-center justify-center py-20 space-y-3">
+                  <div
+                    className="w-8 h-8 border-2 rounded-full animate-spin"
+                    style={{
+                      borderColor: 'var(--border)',
+                      borderTopColor: 'var(--accent)',
+                    }}
+                  />
+                  <p className="text-sm animate-pulse" style={{ color: 'var(--text-muted)' }}>
+                    Carregando palpites...
                   </p>
                 </div>
               )}
 
               {error && (
-                <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm py-4 px-6 rounded-2xl text-center font-semibold">
-                  ⚠️ {error}
+                <div
+                  className="text-sm py-4 px-6 rounded-lg text-center font-medium"
+                  style={{
+                    background: 'var(--live-bg)',
+                    border: '1px solid var(--live-border)',
+                    color: 'var(--live)',
+                  }}
+                >
+                  {error}
                 </div>
               )}
 
               {!loading && !error && guesses && (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {guesses.filter((m: any) => m.status === "FINISHED").length === 0 ? (
-                    <p className="text-gray-500 text-center py-10 text-sm italic">
+                    <p className="text-center py-10 text-sm italic" style={{ color: 'var(--text-muted)' }}>
                       Nenhuma partida finalizada encontrada para este usuário.
                     </p>
                   ) : (
                     guesses
                       .filter((m: any) => m.status === "FINISHED")
                       .map((m: any) => {
-                        const homeFlag = getFlagEmoji(m.team_home);
-                        const awayFlag = getFlagEmoji(m.team_away);
                         const formattedDate = new Intl.DateTimeFormat("pt-BR", {
                           day: "2-digit",
                           month: "short",
@@ -240,83 +271,98 @@ export default function RankingList({ ranking }: RankingListProps) {
                         return (
                           <div
                             key={m.id_match}
-                            className="bg-white/[0.01] hover:bg-white/[0.02] border border-white/[0.04] rounded-2xl p-4 flex flex-col gap-3 transition-all duration-200"
+                            className="rounded-lg p-3 flex flex-col gap-2.5 transition-all duration-150"
+                            style={{
+                              background: 'rgba(255,255,255,0.02)',
+                              border: '1px solid var(--border)',
+                            }}
                           >
-                            {/* Match Header (Date and Status) */}
-                            <div className="flex items-center justify-between text-xs border-b border-white/[0.03] pb-2 w-full">
-                              <span className="text-[10px] text-gray-500 font-semibold uppercase tracking-wider">
-                                📅 {formattedDate}
+                            {/* Date and status */}
+                            <div className="flex items-center justify-between text-xs w-full" style={{ borderBottom: '1px solid var(--border)', paddingBottom: '8px' }}>
+                              <span className="text-[10px] font-medium uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>
+                                {formattedDate}
                               </span>
-                              <span className="bg-gray-800 text-gray-400 border border-white/5 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider">
-                                Finalizado
+                              <span
+                                className="text-[9px] font-semibold uppercase tracking-wide px-2 py-0.5 rounded"
+                                style={{
+                                  background: 'rgba(255,255,255,0.03)',
+                                  color: 'var(--text-muted)',
+                                  border: '1px solid var(--border)',
+                                }}
+                              >
+                                Encerrado
                               </span>
                             </div>
 
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
-                              {/* Teams and Score (Always Horizontal) */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 w-full">
+                              {/* Teams and Score */}
                               <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-4 sm:max-w-md">
                                 <div className="flex items-center gap-2 text-right flex-1 justify-end min-w-0">
-                                  <span className="text-white text-xs font-bold truncate">
+                                  <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                                     {m.team_home}
                                   </span>
-                                  <FlagEmoji
-                                    emoji={homeFlag}
-                                    title={m.team_home}
-                                    size={20}
-                                    className="drop-shadow-sm shrink-0"
-                                  />
+                                  <TeamCrest crest={m.home_crest} name={m.team_home} size={20} />
                                 </div>
 
-                                {/* Match Real Score */}
-                                <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 text-xs font-bold text-gray-400 shrink-0">
+                                <div
+                                  className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-bold shrink-0"
+                                  style={{
+                                    background: 'var(--bg-overlay)',
+                                    color: 'var(--text-muted)',
+                                    border: '1px solid var(--border)',
+                                    fontFamily: 'var(--font-mono)',
+                                  }}
+                                >
                                   <span>{m.home_score ?? "-"}</span>
-                                  <span className="text-[10px] text-gray-600">x</span>
+                                  <span className="text-[10px]" style={{ color: 'var(--text-muted)' }}>x</span>
                                   <span>{m.away_score ?? "-"}</span>
                                 </div>
 
                                 <div className="flex items-center gap-2 text-left flex-1 justify-start min-w-0">
-                                  <FlagEmoji
-                                    emoji={awayFlag}
-                                    title={m.team_away}
-                                    size={20}
-                                    className="drop-shadow-sm shrink-0"
-                                  />
-                                  <span className="text-white text-xs font-bold truncate">
+                                  <TeamCrest crest={m.away_crest} name={m.team_away} size={20} />
+                                  <span className="text-xs font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
                                     {m.team_away}
                                   </span>
                                 </div>
                               </div>
 
                               {/* User Guess */}
-                              <div className="min-w-[120px] text-center sm:text-right w-full sm:w-auto bg-black/20 sm:bg-transparent py-2 sm:py-0 rounded-xl border border-white/5 sm:border-0">
+                              <div
+                                className="min-w-[110px] text-center sm:text-right w-full sm:w-auto py-2 sm:py-0 rounded-lg sm:border-0"
+                                style={{
+                                  background: 'var(--bg-overlay)',
+                                  border: '1px solid var(--border)',
+                                }}
+                              >
                                 {m.guess ? (
-                                  <div>
-                                    <span className="text-[9px] text-gray-500 uppercase font-semibold block">
+                                  <div className="px-3 py-1">
+                                    <span className="text-[9px] font-medium uppercase block" style={{ color: 'var(--text-muted)' }}>
                                       Palpite
                                     </span>
-                                    <span className="text-white text-xs font-extrabold">
+                                    <span className="text-xs font-bold" style={{ color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>
                                       {m.guess.home_score} x {m.guess.away_score}
                                     </span>
                                     {m.guess.points !== null && (
                                       <span
-                                        className={`block text-[10px] font-black mt-0.5 ${
-                                          m.guess.points === 2
-                                            ? "text-amber-400"
+                                        className="block text-[10px] font-bold mt-0.5"
+                                        style={{
+                                          color: m.guess.points === 2
+                                            ? 'var(--points-perfect)'
                                             : m.guess.points === 1
-                                              ? "text-emerald-400"
-                                              : "text-gray-500"
-                                        }`}
+                                              ? 'var(--points-correct)'
+                                              : 'var(--points-zero)',
+                                        }}
                                       >
                                         {m.guess.points === 2
-                                          ? "🎯 +2 pts"
+                                          ? "+2 pts"
                                           : m.guess.points === 1
-                                            ? "⚖️ +1 pt"
-                                            : "❌ 0 pts"}
+                                            ? "+1 pt"
+                                            : "0 pts"}
                                       </span>
                                     )}
                                   </div>
                                 ) : (
-                                  <span className="text-xs text-gray-600 italic">
+                                  <span className="text-xs italic px-3 py-1" style={{ color: 'var(--text-muted)' }}>
                                     Sem palpite
                                   </span>
                                 )}
@@ -330,11 +376,18 @@ export default function RankingList({ ranking }: RankingListProps) {
               )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="p-4 border-t border-white/[0.06] bg-black/20 flex justify-end">
+            {/* Footer */}
+            <div className="p-4 flex justify-end" style={{ borderTop: '1px solid var(--border)' }}>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="px-5 py-2.5 rounded-xl text-xs font-bold bg-white/5 hover:bg-white/10 text-gray-300 border border-white/10 hover:border-white/20 transition-all cursor-pointer active:scale-[0.98]"
+                className="px-5 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer active:scale-[0.98]"
+                style={{
+                  background: 'rgba(255,255,255,0.05)',
+                  color: 'var(--text-secondary)',
+                  border: '1px solid var(--border-hover)',
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = 'rgba(255,255,255,0.05)'; }}
               >
                 Fechar
               </button>

@@ -4,8 +4,8 @@ type ApiMatch = {
   id: number;
   utcDate: string;
   status: string;
-  homeTeam: { shortName: string | null };
-  awayTeam: { shortName: string | null };
+  homeTeam: { shortName: string | null; crest: string | null };
+  awayTeam: { shortName: string | null; crest: string | null };
   score: {
     fullTime: {
       home: number | null;
@@ -34,6 +34,8 @@ export async function getMatches(): Promise<Match[]> {
       id_match: m.id,
       team_home: m.homeTeam.shortName ?? "A definir",
       team_away: m.awayTeam.shortName ?? "A definir",
+      home_crest: m.homeTeam.crest ?? null,
+      away_crest: m.awayTeam.crest ?? null,
       date: new Date(m.utcDate),
       status: m.status as "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED",
       home_score: m.score.fullTime.home,
