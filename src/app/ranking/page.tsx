@@ -18,14 +18,14 @@ export default async function RankingPage() {
   const allMatches = await getMatches();
   await recalcRanking(allMatches);
   const finishedMatchIds = allMatches
-    .filter(m => m.status === 'FINISHED')
-    .map(m => m.id_match)
-    
+    .filter((m) => m.status === "FINISHED")
+    .map((m) => m.id_match);
+
   const [ranking, mostCorrect, mostPerfect, leastCorrect] = await Promise.all([
     getRanking(),
     getMostCorrectGuesses(finishedMatchIds),
     getMostPerfectScores(finishedMatchIds),
-    getLeastCorrectGuesses(finishedMatchIds)
+    getLeastCorrectGuesses(finishedMatchIds),
   ]);
 
   return (
@@ -51,64 +51,87 @@ export default async function RankingPage() {
         </div>
       </div>
 
-      {(mostCorrect || mostPerfect || leastCorrect) && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
-          {/* Card 1: Mais Acertos */}
-          {mostCorrect && (
-            <div className="bg-gradient-to-br from-amber-500/10 to-transparent backdrop-blur-md rounded-2xl border border-amber-500/20 p-5 shadow-lg shadow-amber-500/5 relative overflow-hidden group hover:border-amber-500/35 transition-all duration-300">
-              <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-amber-500/5 font-black select-none pointer-events-none">
-                🎯
-              </div>
-              <p className="text-xs text-amber-500 font-bold uppercase tracking-wider">
-                Mais Acertos
-              </p>
-              <h2 className="text-white text-xl font-bold mt-2 truncate flex items-center gap-1.5">
-                🏅 {mostCorrect.name}
-              </h2>
-              <p className="text-gray-400 text-sm mt-1 font-semibold">
-                {mostCorrect.count} palpites certos
-              </p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
+        {mostCorrect.length > 0 && (
+          <div className="bg-gradient-to-br from-amber-500/10 to-transparent backdrop-blur-md rounded-2xl border border-amber-500/20 p-5 shadow-lg shadow-amber-500/5 relative overflow-hidden group hover:border-amber-500/35 transition-all duration-300">
+            <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-amber-500/5 font-black select-none pointer-events-none">
+              🎯
             </div>
-          )}
-
-          {/* Card 2: Mais Placares Perfeitos */}
-          {mostPerfect && (
-            <div className="bg-gradient-to-br from-emerald-500/10 to-transparent backdrop-blur-md rounded-2xl border border-emerald-500/20 p-5 shadow-lg shadow-emerald-500/5 relative overflow-hidden group hover:border-emerald-500/35 transition-all duration-300">
-              <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-emerald-500/5 font-black select-none pointer-events-none">
-                ⭐
+            <p className="text-xs text-amber-500 font-bold uppercase tracking-wider">
+              Mais Acertos
+            </p>
+            <h2 className="text-white text-xl font-bold mt-2 flex items-center justify-between gap-1.5">
+                <span className="flex items-center gap-1.5">🏅 {mostCorrect[0].name}</span>
+                <span className="text-gray-400 text-sm font-semibold">{mostCorrect[0].count}</span>
+            </h2>
+            
+            {mostCorrect.slice(1).map((entry, index) => (
+              <div
+                key={entry.name}
+                className="flex items-center justify-between mt-2 pt-2 border-t border-white/5"
+              >
+                <span className="text-gray-400 text-sm flex items-center gap-1.5">
+                  {index === 0 ? "🥈" : "🥉"} {entry.name}
+                </span>
+                <span className="text-gray-500 text-xs">{entry.count}</span>
               </div>
-              <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider">
-                Mais Placares Perfeitos
-              </p>
-              <h2 className="text-white text-xl font-bold mt-2 truncate flex items-center gap-1.5">
-                🎯 {mostPerfect.name}
-              </h2>
-              <p className="text-gray-400 text-sm mt-1 font-semibold">
-                {mostPerfect.count} placares perfeitos
-              </p>
-            </div>
-          )}
+            ))}
+          </div>
+        )}
 
-          {/* Card 3: Menos Acertos */}
-          {leastCorrect && (
-            <div className="bg-gradient-to-br from-red-500/10 to-transparent backdrop-blur-md rounded-2xl border border-red-500/20 p-5 shadow-lg shadow-red-500/5 relative overflow-hidden group hover:border-red-500/35 transition-all duration-300">
-              <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-red-500/5 font-black select-none pointer-events-none">
-                💀
+        {mostPerfect.length > 0 && (
+          <div className="bg-gradient-to-br from-emerald-500/10 to-transparent backdrop-blur-md rounded-2xl border border-emerald-500/20 p-5 shadow-lg shadow-emerald-500/5 relative overflow-hidden group hover:border-emerald-500/35 transition-all duration-300">
+            <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-emerald-500/5 font-black select-none pointer-events-none">
+              ⭐
+            </div>
+            <p className="text-xs text-emerald-500 font-bold uppercase tracking-wider">
+              Mais Placares Perfeitos
+            </p>
+            <h2 className="text-white text-xl font-bold mt-2 flex items-center justify-between gap-1.5">
+              <span className="flex items-center gap-1.5">🎯 {mostPerfect[0].name}</span>
+              <span className="text-gray-400 text-sm font-semibold">{mostPerfect[0].count}</span>
+            </h2>
+            {mostPerfect.slice(1).map((entry, index) => (
+              <div
+                key={entry.name}
+                className="flex items-center justify-between mt-2 pt-2 border-t border-white/5"
+              >
+                <span className="text-gray-400 text-sm flex items-center gap-1.5">
+                  {index === 0 ? "🥈" : "🥉"} {entry.name}
+                </span>
+                <span className="text-gray-500 text-xs">{entry.count}</span>
               </div>
-              <p className="text-xs text-red-500 font-bold uppercase tracking-wider">
-                Menos Acertos
-              </p>
-              <h2 className="text-white text-xl font-bold mt-2 truncate flex items-center gap-1.5">
-                😬 {leastCorrect.name}
-              </h2>
-              <p className="text-gray-400 text-sm mt-1 font-semibold">
-                {leastCorrect.count} palpites errados
-              </p>
-            </div>
-          )}
-        </div>
-      )}
+            ))}
+          </div>
+        )}
 
+        {leastCorrect.length > 0 && (
+          <div className="bg-gradient-to-br from-red-500/10 to-transparent backdrop-blur-md rounded-2xl border border-red-500/20 p-5 shadow-lg shadow-red-500/5 relative overflow-hidden group hover:border-red-500/35 transition-all duration-300">
+            <div className="absolute top-0 right-0 -mt-2 -mr-2 text-7xl text-red-500/5 font-black select-none pointer-events-none">
+              💀
+            </div>
+            <p className="text-xs text-red-500 font-bold uppercase tracking-wider">
+              Menos Acertos
+            </p>
+            <h2 className="text-white text-xl font-bold mt-2 flex items-center justify-between gap-1.5">
+              <span className="flex items-center gap-1.5">💀 {leastCorrect[0].name}</span>
+              <span className="text-gray-400 text-sm font-semibold">{leastCorrect[0].count}</span>
+            </h2>
+            {leastCorrect.slice(1).map((entry, index) => (
+              <div
+                key={entry.name}
+                className="flex items-center justify-between mt-2 pt-2 border-t border-white/5"
+              >
+                <span className="text-gray-400 text-sm flex items-center gap-1.5">
+                  {index === 0 ? "💀" : "💀"} {entry.name}
+                </span>
+                <span className="text-gray-500 text-xs">{entry.count}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      
       {/* Ranking List */}
       <RankingList ranking={ranking} />
     </div>

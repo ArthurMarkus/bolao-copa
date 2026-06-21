@@ -73,7 +73,7 @@ export async function getRanking(): Promise<RankingEntry[]> {
     return rows
 }
 
-export async function getMostCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }> {
+export async function getMostCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }[]> {
     const { rows } = await db.query(`
         SELECT u.name, COUNT(*) as count
         FROM guesses g
@@ -82,13 +82,13 @@ export async function getMostCorrectGuesses(matchIds: number[]): Promise<{ name:
         GROUP BY u.id, u.name
         HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id AND match_id = ANY($1)) >= 10
         ORDER BY count DESC
-        LIMIT 1 `, [matchIds]
+        LIMIT 3 `, [matchIds]
     )
 
-    return rows[0]
+    return rows
 }
 
-export async function getMostPerfectScores(matchIds: number[]): Promise<{ name: string, count: number }> {
+export async function getMostPerfectScores(matchIds: number[]): Promise<{ name: string, count: number }[]> {
     const { rows } = await db.query(`
         SELECT u.name, COUNT(*) as count
         FROM guesses g
@@ -97,13 +97,13 @@ export async function getMostPerfectScores(matchIds: number[]): Promise<{ name: 
         GROUP BY u.id, u.name
         HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id AND match_id = ANY($1)) >= 10
         ORDER BY count DESC
-        LIMIT 1 `, [matchIds]
+        LIMIT 3 `, [matchIds]
     )
 
-    return rows[0]
+    return rows
 }
 
-export async function getLeastCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }> {
+export async function getLeastCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }[]> {
     const { rows } = await db.query(`
         SELECT u.name, COUNT(*) as count
         FROM guesses g
@@ -112,8 +112,8 @@ export async function getLeastCorrectGuesses(matchIds: number[]): Promise<{ name
         GROUP BY u.id, u.name
         HAVING (SELECT COUNT(*) FROM guesses WHERE user_id = u.id AND match_id = ANY($1)) >= 10
         ORDER BY count DESC
-        LIMIT 1 `, [matchIds]
+        LIMIT 3 `, [matchIds]
     )
 
-    return rows[0]
+    return rows
 }
