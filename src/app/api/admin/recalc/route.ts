@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
     try {
-        await recalcRanking()
+        await recalcRanking(undefined, true)
         return NextResponse.json({ ok: true })
     } catch {
         return NextResponse.json({ error: "" }, { status: 500})

@@ -20,10 +20,20 @@ export function calcPoints(guess: Guess, match: Match): number {
   return 0;
 }
 
-export async function recalcRanking() {
-  const matches = await getMatches();
+let lastFinishedMatchesHash = "";
+
+export async function recalcRanking(preFetchedMatches?: Match[], force = false) {
+  const matches = preFetchedMatches || await getMatches();
   const finishedMatches = matches.filter((m) => m.status === "FINISHED");
   if (finishedMatches.length === 0) return;
+
+  const currentHash = finishedMatches
+    .map((m) => `${m.id_match}-${m.home_score}-${m.away_score}`)
+    .join("|");
+
+  if (!force && currentHash === lastFinishedMatchesHash) {
+    return;
+  }
 
   const finishedMatchIds = finishedMatches.map((m) => m.id_match);
   const guesses = await findGuessesByMatchIds(finishedMatchIds);
@@ -42,4 +52,6 @@ export async function recalcRanking() {
   if (updates.length > 0) {
     await Promise.all(updates);
   }
+
+  lastFinishedMatchesHash = currentHash;
 }

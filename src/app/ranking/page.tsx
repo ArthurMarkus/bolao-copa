@@ -15,8 +15,8 @@ export const metadata = {
 };
 
 export default async function RankingPage() {
-  await recalcRanking();
-  const allMatches = await getMatches()
+  const allMatches = await getMatches();
+  await recalcRanking(allMatches);
   const finishedMatchIds = allMatches
     .filter(m => m.status === 'FINISHED')
     .map(m => m.id_match)

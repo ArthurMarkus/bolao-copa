@@ -6,14 +6,12 @@ import { redirect } from "next/navigation";
 import MatchesList from "@/components/matches-list";
 
 export default async function MatchesPage() {
-  await recalcRanking();
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const [matches, guesses] = await Promise.all([
-    getMatches(),
-    findGuessesByUser(session.userId),
-  ]);
+  const matches = await getMatches();
+  await recalcRanking(matches);
+  const guesses = await findGuessesByUser(session.userId);
 
   // Filtra apenas partidas com times confirmados
   const confirmedMatches = matches.filter(
