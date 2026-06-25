@@ -31,5 +31,8 @@ export type RankingEntry = {
   user_id: number;
   name: string;
   total_points: number;
+  hits?: number;
+  perfect?: number;
+  misses?: number;
 };
 
