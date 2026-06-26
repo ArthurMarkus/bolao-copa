@@ -25,9 +25,14 @@ export default async function BracketPage() {
   const bracketLocked = bracketMatches.some(
     (m) => m.status === "IN_PLAY" || m.status === "FINISHED",
   );
-  const teamsReady = bracketMatches.some(
-    (m) => m.team_home !== "A definir" && m.team_away !== "A definir",
-  );
+  
+  const last32Matches = bracketMatches.filter((m) => m.stage === "LAST_32");
+  
+  const teamsReady =
+    last32Matches.length > 0 &&
+    last32Matches.every(
+      (m) => m.team_home !== "A definir" && m.team_away !== "A definir",
+    );
 
   if (!teamsReady) {
     return (
