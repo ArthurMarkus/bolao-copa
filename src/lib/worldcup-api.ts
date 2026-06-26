@@ -4,6 +4,7 @@ type ApiMatch = {
   id: number;
   utcDate: string;
   status: string;
+  stage: string;
   homeTeam: { shortName: string | null };
   awayTeam: { shortName: string | null };
   score: {
@@ -28,7 +29,6 @@ export async function getMatches(): Promise<Match[]> {
   if (!res.ok) throw new Error("Erro ao buscar partidas");
 
   const data = await res.json();
-  console.log(data);
   return data.matches.map(
     (m: ApiMatch): Match => ({
       id_match: m.id,
@@ -36,6 +36,7 @@ export async function getMatches(): Promise<Match[]> {
       team_away: m.awayTeam.shortName ?? "A definir",
       date: new Date(m.utcDate),
       status: m.status as "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED",
+      stage: m.stage,
       home_score: m.score.fullTime.home,
       away_score: m.score.fullTime.away,
     }),

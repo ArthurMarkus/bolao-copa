@@ -4,6 +4,7 @@ export type Match = {
   team_away: string;
   home_score: number | null;
   away_score: number | null;
+  stage: string;
   date: Date;
   status: "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED";
 };
@@ -33,3 +34,10 @@ export type RankingEntry = {
   total_points: number;
 };
 
+export type BracketGuess = {
+  id: number
+  user_id: number
+  match_id: number
+  predicted_winner: string
+  points: number
+}

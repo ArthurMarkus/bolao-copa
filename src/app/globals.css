@@ -34,3 +34,11 @@ input::-webkit-inner-spin-button {
 main {
   padding-bottom: max(6rem, env(safe-area-inset-bottom));
 }
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  overflow-x: hidden;
+}
