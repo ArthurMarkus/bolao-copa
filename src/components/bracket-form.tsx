@@ -8,6 +8,7 @@ type BracketColumnProps = {
   picks: Record<number, string>;
   onPick: (matchId: number, team: string) => void;
   isDragging: React.RefObject<boolean>;
+  locked: boolean;
 };
 
 const stageLabels: Record<string, string> = {
@@ -24,6 +25,7 @@ function BracketColumn({
   picks,
   onPick,
   isDragging,
+  locked 
 }: BracketColumnProps) {
   return (
     <div className="flex flex-col gap-4">
@@ -32,32 +34,31 @@ function BracketColumn({
       </p>
       <div className="flex flex-col justify-around flex-1 gap-8">
         {matches.map((match) => (
-          <div
-            key={match.id_match}
-            className="bg-gray-900 rounded-xl border border-gray-800 w-48 overflow-hidden"
-          >
+          <div key={match.id_match} className="bg-gray-900 rounded-xl border border-gray-800 w-48 overflow-hidden">
             <button
+              disabled={locked}
               onClick={() => {
-                if (isDragging.current) return;
+                if (isDragging.current || locked) return;
                 onPick(match.id_match, match.team_home);
               }}
               className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-colors border-b border-gray-800 ${
                 picks[match.id_match] === match.team_home
                   ? "bg-emerald-500/20 text-emerald-400"
-                  : "text-gray-300 hover:bg-white/5"
+                  : locked ? "text-gray-500 cursor-not-allowed" : "text-gray-300 hover:bg-white/5"
               }`}
             >
               {match.team_home}
             </button>
             <button
+              disabled={locked}
               onClick={() => {
-                if (isDragging.current) return;
+                if (isDragging.current || locked) return;
                 onPick(match.id_match, match.team_away);
               }}
               className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-colors ${
                 picks[match.id_match] === match.team_away
                   ? "bg-emerald-500/20 text-emerald-400"
-                  : "text-gray-300 hover:bg-white/5"
+                  : locked ? "text-gray-500 cursor-not-allowed" : "text-gray-300 hover:bg-white/5"
               }`}
             >
               {match.team_away}
@@ -72,15 +73,16 @@ function BracketColumn({
 type BracketFormProps = {
   matches: Match[];
   existingPicks: Record<number, string>;
+  locked: boolean
 };
 
 export default function BracketForm({
   matches,
   existingPicks,
+  locked
 }: BracketFormProps) {
   const [picks, setPicks] = useState<Record<number, string>>(existingPicks);
   const scrollRef = useRef<HTMLDivElement>(null);
-
   const isDragging = useRef(false);
 
   useEffect(() => {
@@ -123,8 +125,6 @@ export default function BracketForm({
     };
   }, []);
 
-  const [toast, setToast] = useState<string | null>(null)
-
   async function pickWinner(matchId: number, team: string) {
   setPicks((prev) => ({ ...prev, [matchId]: team }));
   
@@ -133,9 +133,6 @@ export default function BracketForm({
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ matchId, predictedWinner: team })
   })
-
-  setToast(`${team} avança! ✅`)
-  setTimeout(() => setToast(null), 2000)
 }
 
   const STAGES = [
@@ -188,88 +185,28 @@ export default function BracketForm({
   );
 
   return (
-    <div
-      ref={scrollRef}
-      className="overflow-auto cursor-grab active:cursor-grabbing select-none hide-scrollbar"
-      style={{
-        height: "calc(100vh - 120px)",
-        scrollbarWidth: "none", // Firefox
-        msOverflowStyle: "none", // IE
-      }}
-    >
-      <div className="flex gap-8 min-w-max p-4">
-        <div className="flex gap-8">
-          <BracketColumn
-            stage="LAST_32"
-            matches={last32.left}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-          <BracketColumn
-            stage="LAST_16"
-            matches={last16Left}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-          <BracketColumn
-            stage="QUARTER_FINALS"
-            matches={quartersLeft}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-          <BracketColumn
-            stage="SEMI_FINALS"
-            matches={semisLeft}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
+     <>
+      <div
+        ref={scrollRef}
+        className="overflow-auto cursor-grab active:cursor-grabbing select-none hide-scrollbar"
+        style={{ height: "calc(100vh - 120px)", scrollbarWidth: "none", msOverflowStyle: "none" }}
+      >
+        <div className="flex gap-8 min-w-max p-4">
+          <div className="flex gap-8">
+            <BracketColumn stage="LAST_32" matches={last32.left} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+            <BracketColumn stage="LAST_16" matches={last16Left} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+            <BracketColumn stage="QUARTER_FINALS" matches={quartersLeft} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+            <BracketColumn stage="SEMI_FINALS" matches={semisLeft} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+          </div>
+          <BracketColumn stage="FINAL" matches={finalMatch} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+          <div className="flex gap-8 flex-row-reverse">
+            <BracketColumn stage="LAST_32" matches={last32.right} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+            <BracketColumn stage="LAST_16" matches={last16Right} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+            <BracketColumn stage="QUARTER_FINALS" matches={quartersRight} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+            <BracketColumn stage="SEMI_FINALS" matches={semisRight} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+          </div>
         </div>
-
-        <BracketColumn
-          stage="FINAL"
-          matches={finalMatch}
-          picks={picks}
-          onPick={pickWinner}
-          isDragging={isDragging}
-        />
-
-        <div className="flex gap-8 flex-row-reverse">
-          <BracketColumn
-            stage="LAST_32"
-            matches={last32.right}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-          <BracketColumn
-            stage="LAST_16"
-            matches={last16Right}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-          <BracketColumn
-            stage="QUARTER_FINALS"
-            matches={quartersRight}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-          <BracketColumn
-            stage="SEMI_FINALS"
-            matches={semisRight}
-            picks={picks}
-            onPick={pickWinner}
-            isDragging={isDragging}
-          />
-        </div>
-        <div className="flex justify-center p-6">
       </div>
-      </div>
-    </div>
+    </>
   );
 }

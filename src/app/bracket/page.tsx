@@ -17,10 +17,17 @@ export default async function BracketPage() {
   if (!session) redirect("/login");
 
   const matches = await getMatches();
+
   const bracketMatches = matches.filter((m) =>
     BRACKET_STAGES.includes(m.stage),
   );
-  const teamsReady = bracketMatches.some(m => m.team_home !== "A definir" && m.team_away !== "A definir")
+
+  const bracketLocked = bracketMatches.some(
+    (m) => m.status === "IN_PLAY" || m.status === "FINISHED",
+  );
+  const teamsReady = bracketMatches.some(
+    (m) => m.team_home !== "A definir" && m.team_away !== "A definir",
+  );
 
   if (!teamsReady) {
     return (
@@ -49,12 +56,18 @@ export default async function BracketPage() {
   );
 
   return (
-  <div className="px-4 py-8 overflow-hidden">
-    <h1 className="text-white text-3xl font-extrabold mb-6">🏆 Bracket</h1>
-    <BracketForm
-      matches={bracketMatches}
-      existingPicks={existingPicks}
-    />
-  </div>
-);
+    <div className="px-4 py-8 overflow-hidden">
+      <h1 className="text-white text-3xl font-extrabold mb-6">🏆 Bracket</h1>
+      {bracketLocked && (
+        <p className="text-yellow-400 text-sm mb-4">
+          ⚠️ O mata-mata já começou — seu bracket está bloqueado.
+        </p>
+      )}
+      <BracketForm
+        matches={bracketMatches}
+        existingPicks={existingPicks}
+        locked={bracketLocked}
+      />
+    </div>
+  );
 }
