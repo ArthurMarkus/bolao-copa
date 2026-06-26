@@ -61,17 +61,34 @@ export async function updateGuessPoints(guessId: number, points: number) {
     await db.query('UPDATE guesses SET points = $1 WHERE id = $2', [points, guessId])
 }
 
-export async function getRanking(): Promise<RankingEntry[]> {
+export async function getRanking(finishedMatchIds?: number[]): Promise<RankingEntry[]> {
+    if (!finishedMatchIds || finishedMatchIds.length === 0) {
+        const { rows } = await db.query(`
+            SELECT u.id as user_id, u.name, COALESCE(SUM(g.points), 0)::int as total_points,
+                   0::int as hits, 0::int as perfect, 0::int as misses
+            FROM users u 
+            LEFT JOIN guesses g ON g.user_id = u.id
+            GROUP BY u.id, u.name
+            ORDER BY total_points DESC`
+        )
+        return rows
+    }
+
     const { rows } = await db.query(`
-        SELECT u.id as user_id, u.name, COALESCE(SUM(g.points), 0)::int as total_points
+        SELECT u.id as user_id, u.name, COALESCE(SUM(g.points), 0)::int as total_points,
+               COALESCE(SUM(CASE WHEN g.points > 0 AND g.match_id = ANY($1) THEN 1 ELSE 0 END), 0)::int as hits,
+               COALESCE(SUM(CASE WHEN g.points > 1 AND g.match_id = ANY($1) THEN 1 ELSE 0 END), 0)::int as perfect,
+               COALESCE(SUM(CASE WHEN g.points = 0 AND g.match_id = ANY($1) THEN 1 ELSE 0 END), 0)::int as misses
         FROM users u 
         LEFT JOIN guesses g ON g.user_id = u.id
         GROUP BY u.id, u.name
-        ORDER BY total_points DESC`
+        ORDER BY total_points DESC`,
+        [finishedMatchIds]
     )
 
     return rows
 }
+
 
 export async function getMostCorrectGuesses(matchIds: number[]): Promise<{ name: string, count: number }[]> {
     const { rows } = await db.query(`

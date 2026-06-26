@@ -22,7 +22,7 @@ export default async function RankingPage() {
     .map((m) => m.id_match);
 
   const [ranking, mostCorrect, mostPerfect, leastCorrect] = await Promise.all([
-    getRanking(),
+    getRanking(finishedMatchIds),
     getMostCorrectGuesses(finishedMatchIds),
     getMostPerfectScores(finishedMatchIds),
     getLeastCorrectGuesses(finishedMatchIds),

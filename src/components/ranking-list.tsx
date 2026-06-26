@@ -152,11 +152,27 @@ export default function RankingList({ ranking }: RankingListProps) {
                 </div>
 
                 {/* User Score */}
-                <div className="text-right">
-                  <span className={`${pointsStyle}`}>{entry.total_points}</span>
-                  <span className="text-[10px] sm:text-xs text-gray-400 uppercase font-semibold tracking-wider block sm:inline sm:ml-1">
-                    pts
-                  </span>
+                <div className="text-right flex flex-col items-end justify-center">
+                  <div className="flex items-baseline justify-end">
+                    <span className={`${pointsStyle}`}>{entry.total_points}</span>
+                    <span className="text-[10px] sm:text-xs text-gray-400 uppercase font-semibold tracking-wider ml-1">
+                      pts
+                    </span>
+                  </div>
+                  {entry.hits !== undefined && entry.perfect !== undefined && entry.misses !== undefined && (
+                    <div className="flex items-center gap-1.5 mt-1 text-[10px] sm:text-xs font-semibold tracking-wide">
+                      <span className="text-emerald-400 flex items-center gap-0.5" title="Acertos">
+                        ✔ {entry.hits}
+                      </span>
+                      <span className="text-amber-400 flex items-center gap-0.5" title="Placares Perfeitos">
+                        🎯 {entry.perfect}
+                      </span>
+                      <span className="text-gray-600 select-none">•</span>
+                      <span className="text-red-400 flex items-center gap-0.5" title="Erros">
+                        ✖ {entry.misses}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             );
