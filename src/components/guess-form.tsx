@@ -1,25 +1,33 @@
-"use client"
-import { Match } from "@/types"
-import { useState } from "react"
-import { getFlagEmoji } from "@/lib/flags"
-import FlagEmoji from "@/components/flag-emoji"
+"use client";
+import { Match } from "@/types";
+import { useState } from "react";
+import { getFlagEmoji } from "@/lib/flags";
+import FlagEmoji from "@/components/flag-emoji";
 
 type GuessFormProps = {
-  match: Match
-  existingGuess?: { home_score: number; away_score: number }
-  plain?: boolean
-}
+  match: Match;
+  existingGuess?: { home_score: number; away_score: number };
+  plain?: boolean;
+};
 
-export default function GuessForm({ match, existingGuess, plain = false }: GuessFormProps) {
-  const [homeScore, setHomeScore] = useState(existingGuess?.home_score.toString() ?? "")
-  const [awayScore, setAwayScore] = useState(existingGuess?.away_score.toString() ?? "")
-  const [saved, setSaved] = useState(existingGuess !== undefined)
+export default function GuessForm({
+  match,
+  existingGuess,
+  plain = false,
+}: GuessFormProps) {
+  const [homeScore, setHomeScore] = useState(
+    existingGuess?.home_score.toString() ?? "",
+  );
+  const [awayScore, setAwayScore] = useState(
+    existingGuess?.away_score.toString() ?? "",
+  );
+  const [saved, setSaved] = useState(existingGuess !== undefined);
 
   async function handleSave() {
     // Validar se os valores são numéricos e não vazios
     if (homeScore === "" || awayScore === "") {
-      alert("Por favor, preencha ambos os placares para salvar o palpite.")
-      return
+      alert("Por favor, preencha ambos os placares para salvar o palpite.");
+      return;
     }
 
     const res = await fetch("/api/guesses", {
@@ -30,20 +38,24 @@ export default function GuessForm({ match, existingGuess, plain = false }: Guess
         homeScore: Number(homeScore),
         awayScore: Number(awayScore),
       }),
-    })
-    if (res.ok) setSaved(true)
-    else alert("Erro ao salvar palpite")
+    });
+    if (res.ok) setSaved(true);
+    else alert("Erro ao salvar palpite");
   }
 
-  const homeFlag = getFlagEmoji(match.team_home)
-  const awayFlag = getFlagEmoji(match.team_away)
-  
-  const formattedDate = new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(match.date))
+  const homeFlag = getFlagEmoji(match.team_home);
+  const awayFlag = getFlagEmoji(match.team_away);
+
+  // Proteção por data: bloqueia edição se o jogo já começou,
+  // independente do status retornado pela API.
+  const isMatchOpen = new Date() < new Date(match.date);
+
+  const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(match.date));
 
   const formContent = (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-6">
@@ -51,8 +63,15 @@ export default function GuessForm({ match, existingGuess, plain = false }: Guess
       <div className="flex flex-row items-center justify-between flex-1 w-full gap-2 sm:gap-6">
         {/* Time Casa */}
         <div className="flex items-center gap-2 sm:gap-3 justify-end flex-1 min-w-0">
-          <span className="text-white font-bold text-sm sm:text-base truncate order-1 sm:order-1">{match.team_home}</span>
-          <FlagEmoji emoji={homeFlag} title={match.team_home} size={28} className="order-2 sm:order-2 drop-shadow-sm shrink-0 sm:w-8 sm:h-8" />
+          <span className="text-white font-bold text-sm sm:text-base truncate order-1 sm:order-1">
+            {match.team_home}
+          </span>
+          <FlagEmoji
+            emoji={homeFlag}
+            title={match.team_home}
+            size={28}
+            className="order-2 sm:order-2 drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+          />
         </div>
 
         {/* Inputs de Placar */}
@@ -61,25 +80,42 @@ export default function GuessForm({ match, existingGuess, plain = false }: Guess
             type="number"
             min={0}
             value={homeScore}
-            onChange={e => { setHomeScore(e.target.value); setSaved(false) }}
-            className="w-10 h-8 sm:w-12 sm:h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-lg sm:text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            disabled={!isMatchOpen}
+            onChange={(e) => {
+              setHomeScore(e.target.value);
+              setSaved(false);
+            }}
+            className="w-10 h-8 sm:w-12 sm:h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-lg sm:text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="-"
           />
-          <span className="text-amber-500 font-black text-sm sm:text-lg">x</span>
+          <span className="text-amber-500 font-black text-sm sm:text-lg">
+            x
+          </span>
           <input
             type="number"
             min={0}
             value={awayScore}
-            onChange={e => { setAwayScore(e.target.value); setSaved(false) }}
-            className="w-10 h-8 sm:w-12 sm:h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-lg sm:text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+            disabled={!isMatchOpen}
+            onChange={(e) => {
+              setAwayScore(e.target.value);
+              setSaved(false);
+            }}
+            className="w-10 h-8 sm:w-12 sm:h-10 bg-emerald-950/50 text-white text-center rounded-lg border border-emerald-800/80 text-lg sm:text-xl font-extrabold focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
             placeholder="-"
           />
         </div>
 
         {/* Time Fora */}
         <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
-          <FlagEmoji emoji={awayFlag} title={match.team_away} size={28} className="drop-shadow-sm shrink-0 sm:w-8 sm:h-8" />
-          <span className="text-white font-bold text-sm sm:text-base truncate">{match.team_away}</span>
+          <FlagEmoji
+            emoji={awayFlag}
+            title={match.team_away}
+            size={28}
+            className="drop-shadow-sm shrink-0 sm:w-8 sm:h-8"
+          />
+          <span className="text-white font-bold text-sm sm:text-base truncate">
+            {match.team_away}
+          </span>
         </div>
       </div>
 
@@ -87,20 +123,23 @@ export default function GuessForm({ match, existingGuess, plain = false }: Guess
       <div className="w-full sm:w-auto flex justify-center sm:justify-end min-w-[120px] shrink-0">
         <button
           onClick={handleSave}
+          disabled={!isMatchOpen}
           className={`w-full sm:w-auto px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 shadow-md ${
-            saved 
-              ? "bg-emerald-600/80 hover:bg-emerald-600 text-white border border-emerald-500 cursor-default shadow-emerald-900/30" 
-              : "bg-amber-500 hover:bg-amber-400 text-emerald-950 border border-amber-400 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-amber-950/30"
+            !isMatchOpen
+              ? "bg-gray-800 text-gray-500 border border-gray-700 cursor-not-allowed opacity-60"
+              : saved
+                ? "bg-emerald-600/80 hover:bg-emerald-600 text-white border border-emerald-500 cursor-default shadow-emerald-900/30"
+                : "bg-amber-500 hover:bg-amber-400 text-emerald-950 border border-amber-400 hover:scale-[1.03] active:scale-[0.97] cursor-pointer shadow-amber-950/30"
           }`}
         >
-          {saved ? "✓ Salvo" : "Salvar"}
+          {!isMatchOpen ? "🔒 Encerrado" : saved ? "✓ Salvo" : "Salvar"}
         </button>
       </div>
     </div>
-  )
+  );
 
   if (plain) {
-    return formContent
+    return formContent;
   }
 
   return (
@@ -117,5 +156,5 @@ export default function GuessForm({ match, existingGuess, plain = false }: Guess
 
       {formContent}
     </div>
-  )
+  );
 }

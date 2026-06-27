@@ -91,12 +91,16 @@ export default function MatchesList({
             (g) => g.user_id !== sessionUserId
           );
 
+          // Proteção por data: jogo só aceita palpites se ainda não começou.
+          // Não confiamos apenas no status da API pois ele pode mudar retroativamente.
+          const isMatchOpen = new Date() < new Date(m.date);
+
           return (
             <div
               key={m.id_match}
               id={`match-${m.id_match}`}
               className={`transition-all duration-200 scroll-mt-6 rounded-xl border border-white/[0.04] p-5 shadow-lg bg-gradient-to-r relative overflow-hidden select-none ${
-                m.status === "TIMED"
+                isMatchOpen
                   ? "from-emerald-950/20 to-green-950/10 hover:border-emerald-500/30"
                   : m.status === "IN_PLAY"
                     ? "from-red-950/20 to-yellow-950/10 border-red-900/40 hover:border-red-500/30 shadow-red-950/10"
@@ -110,8 +114,8 @@ export default function MatchesList({
                 onClick={() => toggleMatch(m.id_match)}
                 className="cursor-pointer"
               >
-                {m.status === "TIMED" ? (
-                  // TIMED Match View inside our clickable card
+                {isMatchOpen ? (
+                  // Jogo ainda não começou: exibe formulário de palpite
                   <div>
                     <div className="flex items-center justify-between mb-4 pb-3 border-b border-emerald-900/40 text-xs">
                       <span className="text-emerald-400/80 font-medium flex items-center gap-1.5">
@@ -254,7 +258,7 @@ export default function MatchesList({
                       {matchGuesses.length === 0 ? (
                         <div className="bg-white/[0.01] border border-white/[0.04] rounded-xl p-5 text-center">
                           <p className="text-gray-500 text-xs italic">
-                            {m.status === "TIMED"
+                            {isMatchOpen
                               ? "Os palpites dos outros participantes ficarão visíveis assim que a partida começar!"
                               : "Nenhum participante realizou palpite para este jogo."}
                           </p>
@@ -319,7 +323,7 @@ export default function MatchesList({
                     </>
                   )}
 
-                  {m.status === "TIMED" && !isLoading && !error && matchGuesses.length > 0 && (
+                  {isMatchOpen && !isLoading && !error && matchGuesses.length > 0 && (
                     <p className="text-[10px] text-gray-500 mt-3 text-center">
                       🔒 Os palpites dos outros participantes ficarão visíveis assim que a partida começar.
                     </p>
