@@ -22,9 +22,15 @@ export default async function BracketPage() {
     BRACKET_STAGES.includes(m.stage),
   );
 
-  const bracketLocked = bracketMatches.some(
-    (m) => m.status === "IN_PLAY" || m.status === "FINISHED",
-  );
+  // Proteção por data: bloqueia o bracket se a data atual já passou da
+  // primeira partida do mata-mata. Não confiamos no status da API pois
+  // ele pode mudar retroativamente e permitir edições indevidas.
+  const firstMatch = bracketMatches
+    .slice()
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+  const bracketLocked = firstMatch
+    ? new Date() >= new Date(firstMatch.date)
+    : false;
   
   const last32Matches = bracketMatches.filter((m) => m.stage === "LAST_32");
   
