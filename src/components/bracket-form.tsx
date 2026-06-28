@@ -1,17 +1,14 @@
 "use client";
-import { useState, useRef, useEffect } from "react";
+
+import { useEffect, useRef, useState } from "react";
+
+import FlagEmoji from "@/components/flag-emoji";
+import { getFlagEmoji } from "@/lib/flags";
 import { Match } from "@/types";
 
-type BracketColumnProps = {
-  stage: string;
-  matches: Match[];
-  picks: Record<number, string>;
-  onPick: (matchId: number, team: string) => void;
-  isDragging: React.RefObject<boolean>;
-  locked: boolean;
-};
+// ─── Labels ───────────────────────────────────────────────────────────────────
 
-const stageLabels: Record<string, string> = {
+const STAGE_LABELS: Record<string, string> = {
   LAST_32: "16avos",
   LAST_16: "Oitavas",
   QUARTER_FINALS: "Quartas",
@@ -19,67 +16,233 @@ const stageLabels: Record<string, string> = {
   FINAL: "Final",
 };
 
+// ─── TeamButton ───────────────────────────────────────────────────────────────
+
+function TeamButton({
+  match,
+  team,
+  isHome,
+  picks,
+  onPick,
+  isDragging,
+  locked,
+}: {
+  match: Match;
+  team: string;
+  isHome: boolean;
+  picks: Record<number, string>;
+  onPick: (matchId: number, team: string) => void;
+  isDragging: React.RefObject<boolean>;
+  locked: boolean;
+}) {
+  const isSelected = picks[match.id_match] === team;
+  const isUndefined = team === "A definir";
+
+  return (
+    <button
+      disabled={locked || isUndefined}
+      onClick={() => {
+        if (isDragging.current || locked || isUndefined) return;
+        onPick(match.id_match, team);
+      }}
+      className={[
+        "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-150",
+        isHome ? "border-b border-gray-800/80" : "",
+        isSelected
+          ? "bg-emerald-500/20 text-emerald-400"
+          : locked || isUndefined
+            ? "cursor-not-allowed text-gray-600"
+            : "cursor-pointer text-gray-300 hover:bg-white/5",
+      ].join(" ")}
+    >
+      <FlagEmoji
+        emoji={getFlagEmoji(team)}
+        title={team}
+        size={16}
+        className="shrink-0"
+      />
+      <span className="flex-1 truncate">{team}</span>
+      {isSelected && (
+        <span className="shrink-0 text-xs text-emerald-500">✓</span>
+      )}
+    </button>
+  );
+}
+
+// ─── MatchCard ────────────────────────────────────────────────────────────────
+
+function MatchCard({
+  match,
+  picks,
+  onPick,
+  isDragging,
+  locked,
+}: {
+  match: Match;
+  picks: Record<number, string>;
+  onPick: (matchId: number, team: string) => void;
+  isDragging: React.RefObject<boolean>;
+  locked: boolean;
+}) {
+  const hasWinner = !!picks[match.id_match];
+
+  return (
+    <div
+      className={[
+        "w-48 overflow-hidden rounded-xl bg-gray-900 transition-all duration-200",
+        hasWinner
+          ? "border border-emerald-800/40 shadow-sm shadow-emerald-950/30"
+          : "border border-gray-800",
+      ].join(" ")}
+    >
+      <TeamButton
+        match={match}
+        team={match.team_home}
+        isHome
+        picks={picks}
+        onPick={onPick}
+        isDragging={isDragging}
+        locked={locked}
+      />
+      <TeamButton
+        match={match}
+        team={match.team_away}
+        isHome={false}
+        picks={picks}
+        onPick={onPick}
+        isDragging={isDragging}
+        locked={locked}
+      />
+    </div>
+  );
+}
+
+// ─── BracketColumn ────────────────────────────────────────────────────────────
+// Renders a single round column. Matches are spread evenly with justify-around,
+// exactly as before — no pair grouping so spacing stays natural.
+
 function BracketColumn({
   stage,
   matches,
   picks,
   onPick,
   isDragging,
-  locked 
-}: BracketColumnProps) {
+  locked,
+}: {
+  stage: string;
+  matches: Match[];
+  picks: Record<number, string>;
+  onPick: (matchId: number, team: string) => void;
+  isDragging: React.RefObject<boolean>;
+  locked: boolean;
+}) {
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-xs text-gray-500 font-bold uppercase tracking-wider text-center">
-        {stageLabels[stage]}
+      <p className="text-center text-xs font-bold uppercase tracking-wider text-gray-500">
+        {STAGE_LABELS[stage]}
       </p>
-      <div className="flex flex-col justify-around flex-1 gap-8">
+      <div className="flex flex-1 flex-col justify-around gap-8">
         {matches.map((match) => (
-          <div key={match.id_match} className="bg-gray-900 rounded-xl border border-gray-800 w-48 overflow-hidden">
-            <button
-              disabled={locked}
-              onClick={() => {
-                if (isDragging.current || locked) return;
-                onPick(match.id_match, match.team_home);
-              }}
-              className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-colors border-b border-gray-800 ${
-                picks[match.id_match] === match.team_home
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : locked ? "text-gray-500 cursor-not-allowed" : "text-gray-300 hover:bg-white/5"
-              }`}
-            >
-              {match.team_home}
-            </button>
-            <button
-              disabled={locked}
-              onClick={() => {
-                if (isDragging.current || locked) return;
-                onPick(match.id_match, match.team_away);
-              }}
-              className={`w-full text-left px-3 py-2.5 text-sm font-medium transition-colors ${
-                picks[match.id_match] === match.team_away
-                  ? "bg-emerald-500/20 text-emerald-400"
-                  : locked ? "text-gray-500 cursor-not-allowed" : "text-gray-300 hover:bg-white/5"
-              }`}
-            >
-              {match.team_away}
-            </button>
-          </div>
+          <MatchCard
+            key={match.id_match}
+            match={match}
+            picks={picks}
+            onPick={onPick}
+            isDragging={isDragging}
+            locked={locked}
+          />
         ))}
       </div>
     </div>
   );
 }
 
+// ─── FinalCard ────────────────────────────────────────────────────────────────
+// The match card is always visible. When a champion is picked, a compact
+// golden badge slides in ABOVE the card without pushing it down.
+
+function FinalCard({
+  match,
+  picks,
+  onPick,
+  isDragging,
+  locked,
+}: {
+  match: Match;
+  picks: Record<number, string>;
+  onPick: (matchId: number, team: string) => void;
+  isDragging: React.RefObject<boolean>;
+  locked: boolean;
+}) {
+  const champion = picks[match.id_match];
+
+  return (
+    <div className="relative px-2">
+      {/* Label + champion badge — absolutely above the match card, no layout impact */}
+      <div className="absolute bottom-full left-0 right-0 flex flex-col items-center gap-1.5 pb-3">
+        <p className="text-center text-xs font-bold uppercase tracking-wider text-gray-500">
+          {STAGE_LABELS.FINAL}
+        </p>
+        {champion && (
+          <div className="flex w-52 items-center gap-3 rounded-xl border border-yellow-700/40 bg-gradient-to-r from-yellow-900/40 to-amber-900/20 px-4 py-2.5 shadow-md shadow-yellow-950/30">
+            <span className="animate-bounce text-2xl">🏆</span>
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-yellow-500/70">
+                Campeão
+              </p>
+              <div className="flex items-center gap-1.5">
+                <FlagEmoji
+                  emoji={getFlagEmoji(champion)}
+                  title={champion}
+                  size={16}
+                  className="shrink-0"
+                />
+                <p className="truncate text-sm font-bold text-white">
+                  {champion}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Match card — in normal flow, aligns with semi-finals via items-center on parent */}
+      <div className="w-52 overflow-hidden rounded-xl border border-gray-700 bg-gray-900">
+        <TeamButton
+          match={match}
+          team={match.team_home}
+          isHome
+          picks={picks}
+          onPick={onPick}
+          isDragging={isDragging}
+          locked={locked}
+        />
+        <TeamButton
+          match={match}
+          team={match.team_away}
+          isHome={false}
+          picks={picks}
+          onPick={onPick}
+          isDragging={isDragging}
+          locked={locked}
+        />
+      </div>
+    </div>
+  );
+}
+
+// ─── BracketForm ──────────────────────────────────────────────────────────────
+
 type BracketFormProps = {
   matches: Match[];
   existingPicks: Record<number, string>;
-  locked: boolean
+  locked: boolean;
 };
 
 export default function BracketForm({
   matches,
   existingPicks,
-  locked
+  locked,
 }: BracketFormProps) {
   const [picks, setPicks] = useState<Record<number, string>>(existingPicks);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -101,12 +264,10 @@ export default function BracketForm({
       scrollLeft = el.scrollLeft;
       e.preventDefault();
     };
-
     const onMouseUp = () => {
       isDown = false;
       el.style.cursor = "grab";
     };
-
     const onMouseMove = (e: MouseEvent) => {
       if (!isDown) return;
       isDragging.current = true;
@@ -117,7 +278,6 @@ export default function BracketForm({
     el.addEventListener("mousedown", onMouseDown);
     document.addEventListener("mouseup", onMouseUp);
     document.addEventListener("mousemove", onMouseMove);
-
     return () => {
       el.removeEventListener("mousedown", onMouseDown);
       document.removeEventListener("mouseup", onMouseUp);
@@ -126,14 +286,13 @@ export default function BracketForm({
   }, []);
 
   async function pickWinner(matchId: number, team: string) {
-  setPicks((prev) => ({ ...prev, [matchId]: team }));
-  
-  await fetch("/api/bracket", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ matchId, predictedWinner: team })
-  })
-}
+    setPicks((prev) => ({ ...prev, [matchId]: team }));
+    await fetch("/api/bracket", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ matchId, predictedWinner: team }),
+    });
+  }
 
   const STAGES = [
     "LAST_32",
@@ -143,9 +302,12 @@ export default function BracketForm({
     "FINAL",
   ];
 
+  // Ordenar por id_match garante ordem determinística igual à ordem do chaveamento na API
   const matchesByStage = STAGES.reduce(
     (acc, stage) => {
-      acc[stage] = matches.filter((m) => m.stage === stage);
+      acc[stage] = matches
+        .filter((m) => m.stage === stage)
+        .sort((a, b) => a.id_match - b.id_match);
       return acc;
     },
     {} as Record<string, Match[]>,
@@ -153,10 +315,8 @@ export default function BracketForm({
 
   const half = (stage: string) => {
     const arr = matchesByStage[stage];
-    return {
-      left: arr.slice(0, arr.length / 2),
-      right: arr.slice(arr.length / 2),
-    };
+    const mid = Math.floor(arr.length / 2);
+    return { left: arr.slice(0, mid), right: arr.slice(mid) };
   };
 
   const last32 = half("LAST_32");
@@ -164,12 +324,12 @@ export default function BracketForm({
   const quarters = half("QUARTER_FINALS");
   const semis = half("SEMI_FINALS");
 
+  // Cada par de jogos consecutivos (i*2, i*2+1) alimenta o slot i da próxima ronda
   function getNextRoundMatches(currentMatches: Match[], nextMatches: Match[]) {
-    const winners = currentMatches.map((m) => picks[m.id_match] ?? "A definir");
     return nextMatches.map((match, i) => ({
       ...match,
-      team_home: winners[i * 2] ?? "A definir",
-      team_away: winners[i * 2 + 1] ?? "A definir",
+      team_home: picks[currentMatches[i * 2]?.id_match] ?? "A definir",
+      team_away: picks[currentMatches[i * 2 + 1]?.id_match] ?? "A definir",
     }));
   }
 
@@ -179,31 +339,62 @@ export default function BracketForm({
   const quartersRight = getNextRoundMatches(last16Right, quarters.right);
   const semisLeft = getNextRoundMatches(quartersLeft, semis.left);
   const semisRight = getNextRoundMatches(quartersRight, semis.right);
-  const finalMatch = getNextRoundMatches(
-    [...semisLeft, ...semisRight],
-    matchesByStage["FINAL"],
-  );
+
+  // A final recebe o vencedor da semi esquerda e o da semi direita
+  const finalMatches = matchesByStage["FINAL"].map((match) => ({
+    ...match,
+    team_home: picks[semis.left[0]?.id_match] ?? "A definir",
+    team_away: picks[semis.right[0]?.id_match] ?? "A definir",
+  }));
+
+  const colProps = (stage: string, matchList: Match[]) => ({
+    stage,
+    matches: matchList,
+    picks,
+    onPick: pickWinner,
+    isDragging,
+    locked,
+  });
 
   return (
-     <>
+    <>
       <div
         ref={scrollRef}
-        className="overflow-auto cursor-grab active:cursor-grabbing select-none hide-scrollbar"
-        style={{ height: "calc(100vh - 120px)", scrollbarWidth: "none", msOverflowStyle: "none" }}
+        className="hide-scrollbar cursor-grab select-none overflow-auto active:cursor-grabbing"
+        style={{
+          height: "calc(100vh - 120px)",
+          scrollbarWidth: "none",
+          msOverflowStyle: "none",
+        }}
       >
-        <div className="flex gap-8 min-w-max p-4">
-          <div className="flex gap-8">
-            <BracketColumn stage="LAST_32" matches={last32.left} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-            <BracketColumn stage="LAST_16" matches={last16Left} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-            <BracketColumn stage="QUARTER_FINALS" matches={quartersLeft} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-            <BracketColumn stage="SEMI_FINALS" matches={semisLeft} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+        <div className="flex min-w-max items-stretch gap-8 p-4">
+          {/* ── Left side ── */}
+          <div className="flex items-stretch gap-8">
+            <BracketColumn {...colProps("LAST_32", last32.left)} />
+            <BracketColumn {...colProps("LAST_16", last16Left)} />
+            <BracketColumn {...colProps("QUARTER_FINALS", quartersLeft)} />
+            <BracketColumn {...colProps("SEMI_FINALS", semisLeft)} />
           </div>
-          <BracketColumn stage="FINAL" matches={finalMatch} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-          <div className="flex gap-8 flex-row-reverse">
-            <BracketColumn stage="LAST_32" matches={last32.right} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-            <BracketColumn stage="LAST_16" matches={last16Right} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-            <BracketColumn stage="QUARTER_FINALS" matches={quartersRight} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
-            <BracketColumn stage="SEMI_FINALS" matches={semisRight} picks={picks} onPick={pickWinner} isDragging={isDragging} locked={locked} />
+
+          {/* ── Center: Final ── */}
+          <div className="flex items-center">
+            {finalMatches[0] && (
+              <FinalCard
+                match={finalMatches[0]}
+                picks={picks}
+                onPick={pickWinner}
+                isDragging={isDragging}
+                locked={locked}
+              />
+            )}
+          </div>
+
+          {/* ── Right side (mirrored) ── */}
+          <div className="flex flex-row-reverse items-stretch gap-8">
+            <BracketColumn {...colProps("LAST_32", last32.right)} />
+            <BracketColumn {...colProps("LAST_16", last16Right)} />
+            <BracketColumn {...colProps("QUARTER_FINALS", quartersRight)} />
+            <BracketColumn {...colProps("SEMI_FINALS", semisRight)} />
           </div>
         </div>
       </div>
