@@ -189,34 +189,53 @@ export default function MatchesList({
                           />
                         </div>
 
-                        {/* Placar Real */}
-                        <div className={`flex flex-col items-center gap-0.5`}>
-                          <div className={`flex items-center gap-2 sm:gap-3 bg-black/40 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border shrink-0 ${
-                            m.status === "IN_PLAY" ? "border-red-900/30 bg-black/60" : "border-gray-800"
+                        {/* Placar */}
+                        <div className="flex flex-col items-center gap-1 shrink-0">
+
+                          {/* Placar principal (90 min / tempo regular) */}
+                          <div className={`flex items-center gap-2 sm:gap-3 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border shrink-0 ${
+                            m.status === "IN_PLAY"
+                              ? "border-red-900/30 bg-black/60"
+                              : m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED"
+                                ? "border-amber-900/40 bg-amber-950/20"
+                                : m.score_duration === "EXTRA_TIME" && m.status === "FINISHED"
+                                  ? "border-blue-900/40 bg-blue-950/20"
+                                  : "border-gray-800 bg-black/40"
                           }`}>
                             <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
                               {m.home_score ?? 0}
                             </span>
-                            <span className={`${m.status === "IN_PLAY" ? "text-amber-500" : "text-gray-500"} font-black text-sm sm:text-lg`}>
-                              {m.status === "IN_PLAY" ? "-" : "x"}
+                            <span className={`font-black text-sm sm:text-lg ${m.status === "IN_PLAY" ? "text-amber-500" : "text-gray-500"}`}>
+                              {m.status === "IN_PLAY" ? "–" : "×"}
                             </span>
                             <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
                               {m.away_score ?? 0}
                             </span>
                           </div>
+
+                          {/* Badge + placar final (pênaltis/prorrogação) */}
                           {m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED" && (
-                            <span className="text-[10px] text-amber-400 font-bold tracking-wide uppercase bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-900/40">
-                              Pênaltis
-                            </span>
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="text-[9px] text-amber-400/70 font-semibold tracking-wide uppercase">
+                                Pên:&nbsp;
+                                <span className="font-extrabold text-amber-300">
+                                  {m.regular_home_score ?? 0}
+                                  &nbsp;×&nbsp;
+                                  {m.regular_away_score ?? 0}
+                                </span>
+                              </span>
+                              <span className="text-[9px] text-amber-400 font-bold tracking-widest uppercase bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
+                                🥅 Pênaltis
+                              </span>
+                            </div>
                           )}
                           {m.score_duration === "EXTRA_TIME" && m.status === "FINISHED" && (
-                            <span className="text-[10px] text-blue-400 font-bold tracking-wide uppercase bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-900/40">
-                              Prorrogação
+                            <span className="text-[9px] text-blue-400 font-bold tracking-widest uppercase bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/25">
+                              ⏱ Prorrogação
                             </span>
                           )}
+
                         </div>
-
-
                         {/* Time Fora */}
                         <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
                           <FlagEmoji

@@ -285,19 +285,33 @@ export default function RankingList({ ranking }: RankingListProps) {
 
                                 {/* Match Real Score */}
                                 <div className="flex flex-col items-center gap-0.5 shrink-0">
-                                  <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 text-xs font-bold text-gray-400">
-                                    <span>{m.home_score ?? "-"}</span>
-                                    <span className="text-[10px] text-gray-600">x</span>
-                                    <span>{m.away_score ?? "-"}</span>
+                                  <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-xs font-bold text-gray-300 ${
+                                    m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED"
+                                      ? "bg-amber-950/30 border-amber-900/40"
+                                      : m.score_duration === "EXTRA_TIME" && m.status === "FINISHED"
+                                        ? "bg-blue-950/30 border-blue-900/40"
+                                        : "bg-black/40 border-white/5"
+                                  }`}>
+                                    <span>{m.home_score ?? "–"}</span>
+                                    <span className="text-[10px] text-gray-600">×</span>
+                                    <span>{m.away_score ?? "–"}</span>
                                   </div>
                                   {m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED" && (
-                                    <span className="text-[9px] text-amber-400 font-bold uppercase bg-amber-950/60 px-1.5 py-0.5 rounded-full border border-amber-900/40 leading-none">
-                                      Pên.
-                                    </span>
+                                    <div className="flex flex-col items-center gap-px">
+                                      <span className="text-[8px] text-amber-400/60 font-semibold leading-none">
+                                        pên&nbsp;
+                                        <span className="text-amber-300 font-extrabold">
+                                          {m.regular_home_score ?? 0}&nbsp;×&nbsp;{m.regular_away_score ?? 0}
+                                        </span>
+                                      </span>
+                                      <span className="text-[8px] text-amber-400 font-bold uppercase bg-amber-500/10 px-1.5 py-px rounded-full border border-amber-500/25 leading-none">
+                                        🥅 Pênaltis
+                                      </span>
+                                    </div>
                                   )}
                                   {m.score_duration === "EXTRA_TIME" && m.status === "FINISHED" && (
-                                    <span className="text-[9px] text-blue-400 font-bold uppercase bg-blue-950/60 px-1.5 py-0.5 rounded-full border border-blue-900/40 leading-none">
-                                      Prorr.
+                                    <span className="text-[8px] text-blue-400 font-bold uppercase bg-blue-500/10 px-1.5 py-px rounded-full border border-blue-500/25 leading-none">
+                                      ⏱ Prorr.
                                     </span>
                                   )}
                                 </div>
