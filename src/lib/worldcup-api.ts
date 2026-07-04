@@ -8,10 +8,26 @@ type ApiMatch = {
   homeTeam: { shortName: string | null };
   awayTeam: { shortName: string | null };
   score: {
+    /** Como a partida terminou: REGULAR, EXTRA_TIME ou PENALTY_SHOOTOUT */
+    duration: "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT" | null;
+    /** Placar acumulado final (inclui pênaltis se houver) */
     fullTime: {
       home: number | null;
       away: number | null;
     };
+    /**
+     * Placar apenas dos 90 minutos (tempo regular).
+     * Presente quando duration === EXTRA_TIME ou PENALTY_SHOOTOUT.
+     */
+    regularTime?: {
+      home: number | null;
+      away: number | null;
+    } | null;
+    /** Gols apenas do shootout de pênaltis (ex: 6 e 5) */
+    penalties?: {
+      home: number | null;
+      away: number | null;
+    } | null;
   };
 };
 
@@ -30,17 +46,39 @@ export async function getMatches(): Promise<Match[]> {
 
   const data = await res.json();
   return data.matches.map(
-    (m: ApiMatch): Match => ({
-      id_match: m.id,
-      team_home: m.homeTeam.shortName ?? "A definir",
-      team_away: m.awayTeam.shortName ?? "A definir",
-      date: new Date(m.utcDate),
-      status: m.status as "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED",
-      stage: m.stage,
-      home_score: m.score.fullTime.home,
-      away_score: m.score.fullTime.away,
-    }),
+    (m: ApiMatch): Match => {
+      const duration = m.score.duration;
+      const fullTime = m.score.fullTime;
+      const regularTime = m.score.regularTime;
+
+      // Para pênaltis ou prorrogação: o placar "oficial" para pontuação do bolão
+      // é o do tempo regular (90 min), não o acumulado com os pênaltis.
+      // regularTime estará preenchido nesses casos.
+      const useRegularTime =
+        (duration === "PENALTY_SHOOTOUT" || duration === "EXTRA_TIME") &&
+        regularTime != null;
+
+      return {
+        id_match: m.id,
+        team_home: m.homeTeam.shortName ?? "A definir",
+        team_away: m.awayTeam.shortName ?? "A definir",
+        date: new Date(m.utcDate),
+        status: m.status as "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED",
+        stage: m.stage,
+        score_duration: duration ?? null,
+        // home_score / away_score: placar para fins de pontuação (tempo regular, 90 min)
+        home_score: useRegularTime ? regularTime!.home : fullTime.home,
+        away_score: useRegularTime ? regularTime!.away : fullTime.away,
+        // Placar acumulado final (fullTime da API — 7×6 no exemplo de pênaltis)
+        final_home_score: fullTime.home,
+        final_away_score: fullTime.away,
+        // Placar só do shootout de pênaltis (ex: 6×5); null se não houve
+        penalty_home_score: m.score.penalties?.home ?? null,
+        penalty_away_score: m.score.penalties?.away ?? null,
+      };
+    },
   );
+
 }
 
 export async function getMatchById(id: number): Promise<Match | null> {
