@@ -284,11 +284,24 @@ export default function RankingList({ ranking }: RankingListProps) {
                                 </div>
 
                                 {/* Match Real Score */}
-                                <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 text-xs font-bold text-gray-400 shrink-0">
-                                  <span>{m.home_score ?? "-"}</span>
-                                  <span className="text-[10px] text-gray-600">x</span>
-                                  <span>{m.away_score ?? "-"}</span>
+                                <div className="flex flex-col items-center gap-0.5 shrink-0">
+                                  <div className="flex items-center gap-1.5 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5 text-xs font-bold text-gray-400">
+                                    <span>{m.home_score ?? "-"}</span>
+                                    <span className="text-[10px] text-gray-600">x</span>
+                                    <span>{m.away_score ?? "-"}</span>
+                                  </div>
+                                  {m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED" && (
+                                    <span className="text-[9px] text-amber-400 font-bold uppercase bg-amber-950/60 px-1.5 py-0.5 rounded-full border border-amber-900/40 leading-none">
+                                      Pên.
+                                    </span>
+                                  )}
+                                  {m.score_duration === "EXTRA_TIME" && m.status === "FINISHED" && (
+                                    <span className="text-[9px] text-blue-400 font-bold uppercase bg-blue-950/60 px-1.5 py-0.5 rounded-full border border-blue-900/40 leading-none">
+                                      Prorr.
+                                    </span>
+                                  )}
                                 </div>
+
 
                                 <div className="flex items-center gap-2 text-left flex-1 justify-start min-w-0">
                                   <FlagEmoji

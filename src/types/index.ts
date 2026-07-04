@@ -4,6 +4,11 @@ export type Match = {
   team_away: string;
   home_score: number | null;
   away_score: number | null;
+  /** Placar apenas do tempo regular (90 min), sem pênaltis nem prorrogação */
+  regular_home_score: number | null;
+  regular_away_score: number | null;
+  /** Como a partida terminou: REGULAR, EXTRA_TIME ou PENALTY_SHOOTOUT */
+  score_duration: "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT" | null;
   stage: string;
   date: Date;
   status: "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED";

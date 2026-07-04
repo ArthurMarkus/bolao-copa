@@ -190,19 +190,32 @@ export default function MatchesList({
                         </div>
 
                         {/* Placar Real */}
-                        <div className={`flex items-center gap-2 sm:gap-3 bg-black/40 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border shrink-0 ${
-                          m.status === "IN_PLAY" ? "border-red-900/30 bg-black/60" : "border-gray-800"
-                        }`}>
-                          <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
-                            {m.home_score ?? 0}
-                          </span>
-                          <span className={`${m.status === "IN_PLAY" ? "text-amber-500" : "text-gray-500"} font-black text-sm sm:text-lg`}>
-                            {m.status === "IN_PLAY" ? "-" : "x"}
-                          </span>
-                          <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
-                            {m.away_score ?? 0}
-                          </span>
+                        <div className={`flex flex-col items-center gap-0.5`}>
+                          <div className={`flex items-center gap-2 sm:gap-3 bg-black/40 px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-xl border shrink-0 ${
+                            m.status === "IN_PLAY" ? "border-red-900/30 bg-black/60" : "border-gray-800"
+                          }`}>
+                            <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
+                              {m.home_score ?? 0}
+                            </span>
+                            <span className={`${m.status === "IN_PLAY" ? "text-amber-500" : "text-gray-500"} font-black text-sm sm:text-lg`}>
+                              {m.status === "IN_PLAY" ? "-" : "x"}
+                            </span>
+                            <span className="text-white font-extrabold text-lg sm:text-2xl px-1 sm:px-2">
+                              {m.away_score ?? 0}
+                            </span>
+                          </div>
+                          {m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED" && (
+                            <span className="text-[10px] text-amber-400 font-bold tracking-wide uppercase bg-amber-950/60 px-2 py-0.5 rounded-full border border-amber-900/40">
+                              Pênaltis
+                            </span>
+                          )}
+                          {m.score_duration === "EXTRA_TIME" && m.status === "FINISHED" && (
+                            <span className="text-[10px] text-blue-400 font-bold tracking-wide uppercase bg-blue-950/60 px-2 py-0.5 rounded-full border border-blue-900/40">
+                              Prorrogação
+                            </span>
+                          )}
                         </div>
+
 
                         {/* Time Fora */}
                         <div className="flex items-center gap-2 sm:gap-3 justify-start flex-1 min-w-0">
