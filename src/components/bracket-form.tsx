@@ -89,8 +89,10 @@ function MatchCard({
   locked: boolean;
   stage: string;
 }) {
-  const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
-    ? match.home_score > match.away_score ? match.team_home : match.team_away : null
+  
+  const realWinner = match.status === 'FINISHED' && match.final_home_score !== null && match.final_away_score !== null
+  ? match.final_home_score > match.final_away_score ? match.team_home : match.team_away
+  : null
   const hasWinner = !!picks[match.id_match];
   const userPick = picks[match.id_match]
   const userWasRight = userPick === realWinner
@@ -195,8 +197,9 @@ function FinalCard({
   locked: boolean;
 }) {
   const champion = picks[match.id_match];
-  const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
-    ? match.home_score > match.away_score ? match.team_home : match.team_away : null
+  const realWinner = match.status === 'FINISHED' && match.final_home_score !== null && match.final_away_score !== null
+  ? match.final_home_score > match.final_away_score ? match.team_home : match.team_away
+  : null
 
   return (
     <div className="relative px-2">
