@@ -26,6 +26,7 @@ function TeamButton({
   onPick,
   isDragging,
   locked,
+  realWinner,
 }: {
   match: Match;
   team: string;
@@ -34,39 +35,41 @@ function TeamButton({
   onPick: (matchId: number, team: string) => void;
   isDragging: React.RefObject<boolean>;
   locked: boolean;
+  realWinner: string | null;
 }) {
   const isSelected = picks[match.id_match] === team;
   const isUndefined = team === "A definir";
 
-  return (
-    <button
-      disabled={locked || isUndefined}
-      onClick={() => {
-        if (isDragging.current || locked || isUndefined) return;
-        onPick(match.id_match, team);
-      }}
-      className={[
-        "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-150",
-        isHome ? "border-b border-gray-800/80" : "",
-        isSelected
-          ? "bg-emerald-500/20 text-emerald-400"
-          : locked || isUndefined
-            ? "cursor-not-allowed text-gray-600"
-            : "cursor-pointer text-gray-300 hover:bg-white/5",
-      ].join(" ")}
-    >
-      <FlagEmoji
-        emoji={getFlagEmoji(team)}
-        title={team}
-        size={16}
-        className="shrink-0"
-      />
-      <span className="flex-1 truncate">{team}</span>
-      {isSelected && (
-        <span className="shrink-0 text-xs text-emerald-500">✓</span>
-      )}
-    </button>
-  );
+  const isRealWinner = realWinner === team
+  const isCorrectPick = isSelected && isRealWinner
+
+return (
+  <button
+    disabled={locked || isUndefined}
+    onClick={() => {
+      if (isDragging.current || locked || isUndefined) return;
+      onPick(match.id_match, team);
+    }}
+    className={[
+      "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-150",
+      isHome ? "border-b border-gray-800/80" : "",
+      isCorrectPick
+        ? "bg-yellow-500/20 text-yellow-400"
+        : isRealWinner
+          ? "bg-yellow-500/10 text-yellow-600"
+          : isSelected
+            ? "bg-emerald-500/20 text-emerald-400"
+            : locked || isUndefined
+              ? "cursor-not-allowed text-gray-600"
+              : "cursor-pointer text-gray-300 hover:bg-white/5",
+    ].join(" ")}
+  >
+    <FlagEmoji emoji={getFlagEmoji(team)} title={team} size={16} className="shrink-0" />
+    <span className="flex-1 truncate">{team}</span>
+    {isCorrectPick && <span className="shrink-0 text-xs text-yellow-500">★</span>}
+    {isSelected && !isCorrectPick && <span className="shrink-0 text-xs text-emerald-500">✓</span>}
+  </button>
+);
 }
 
 // ─── MatchCard ────────────────────────────────────────────────────────────────
@@ -84,6 +87,8 @@ function MatchCard({
   isDragging: React.RefObject<boolean>;
   locked: boolean;
 }) {
+  const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
+    ? match.home_score > match.away_score ? match.team_home : match.team_away : null
   const hasWinner = !!picks[match.id_match];
 
   return (
@@ -103,6 +108,7 @@ function MatchCard({
         onPick={onPick}
         isDragging={isDragging}
         locked={locked}
+        realWinner={realWinner}
       />
       <TeamButton
         match={match}
@@ -112,6 +118,7 @@ function MatchCard({
         onPick={onPick}
         isDragging={isDragging}
         locked={locked}
+        realWinner={realWinner}
       />
     </div>
   );
@@ -175,6 +182,8 @@ function FinalCard({
   locked: boolean;
 }) {
   const champion = picks[match.id_match];
+  const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
+    ? match.home_score > match.away_score ? match.team_home : match.team_away : null
 
   return (
     <div className="relative px-2">
@@ -216,6 +225,7 @@ function FinalCard({
           onPick={onPick}
           isDragging={isDragging}
           locked={locked}
+          realWinner={realWinner}
         />
         <TeamButton
           match={match}
@@ -225,6 +235,7 @@ function FinalCard({
           onPick={onPick}
           isDragging={isDragging}
           locked={locked}
+          realWinner={realWinner}
         />
       </div>
     </div>
