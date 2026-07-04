@@ -80,16 +80,20 @@ function MatchCard({
   onPick,
   isDragging,
   locked,
+  stage,
 }: {
   match: Match;
   picks: Record<number, string>;
   onPick: (matchId: number, team: string) => void;
   isDragging: React.RefObject<boolean>;
   locked: boolean;
+  stage: string;
 }) {
   const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
     ? match.home_score > match.away_score ? match.team_home : match.team_away : null
   const hasWinner = !!picks[match.id_match];
+  const userPick = picks[match.id_match]
+  const userWasRight = userPick === realWinner
 
   return (
     <div
@@ -120,6 +124,14 @@ function MatchCard({
         locked={locked}
         realWinner={realWinner}
       />
+      {match.status === 'FINISHED' && userPick && stage !== 'LAST_32' && (
+        <div className={`px-3 py-1.5 text-xs border-t border-gray-800/80 flex items-center gap-1.5 ${
+          userWasRight ? "text-yellow-500 bg-yellow-500/5" : "text-gray-500 bg-transparent"
+        }`}>
+          <span>{userWasRight ? "★" : "✗"}</span>
+          <span>Seu palpite: {userPick}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -157,6 +169,7 @@ function BracketColumn({
             onPick={onPick}
             isDragging={isDragging}
             locked={locked}
+            stage={stage}
           />
         ))}
       </div>
@@ -337,12 +350,16 @@ export default function BracketForm({
 
   // Cada par de jogos consecutivos (i*2, i*2+1) alimenta o slot i da próxima ronda
   function getNextRoundMatches(currentMatches: Match[], nextMatches: Match[]) {
-    return nextMatches.map((match, i) => ({
-      ...match,
-      team_home: picks[currentMatches[i * 2]?.id_match] ?? "A definir",
-      team_away: picks[currentMatches[i * 2 + 1]?.id_match] ?? "A definir",
-    }));
-  }
+  return nextMatches.map((match, i) => ({
+    ...match,
+    team_home: match.status === 'FINISHED'
+      ? match.team_home
+      : picks[currentMatches[i * 2]?.id_match] ?? "A definir",
+    team_away: match.status === 'FINISHED'
+      ? match.team_away
+      : picks[currentMatches[i * 2 + 1]?.id_match] ?? "A definir",
+  }));
+}
 
   const last16Left = getNextRoundMatches(last32.left, last16.left);
   const last16Right = getNextRoundMatches(last32.right, last16.right);
