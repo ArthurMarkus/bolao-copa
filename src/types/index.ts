@@ -2,11 +2,15 @@ export type Match = {
   id_match: number;
   team_home: string;
   team_away: string;
+  /** Para pontuação do bolão: placar dos 90 min (tempo regular) */
   home_score: number | null;
   away_score: number | null;
-  /** Placar apenas do tempo regular (90 min), sem pênaltis nem prorrogação */
-  regular_home_score: number | null;
-  regular_away_score: number | null;
+  /** Placar acumulado final (fullTime da API — inclui ET e pênaltis se houver) */
+  final_home_score: number | null;
+  final_away_score: number | null;
+  /** Placar da disputa de pênaltis (somente os gols do shootout, ex: 6×5) */
+  penalty_home_score: number | null;
+  penalty_away_score: number | null;
   /** Como a partida terminou: REGULAR, EXTRA_TIME ou PENALTY_SHOOTOUT */
   score_duration: "REGULAR" | "EXTRA_TIME" | "PENALTY_SHOOTOUT" | null;
   stage: string;

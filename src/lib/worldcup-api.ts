@@ -23,6 +23,11 @@ type ApiMatch = {
       home: number | null;
       away: number | null;
     } | null;
+    /** Gols apenas do shootout de pênaltis (ex: 6 e 5) */
+    penalties?: {
+      home: number | null;
+      away: number | null;
+    } | null;
   };
 };
 
@@ -61,12 +66,15 @@ export async function getMatches(): Promise<Match[]> {
         status: m.status as "TIMED" | "IN_PLAY" | "FINISHED" | "PAUSED",
         stage: m.stage,
         score_duration: duration ?? null,
-        // home_score / away_score: placar para fins de pontuação (tempo regular)
+        // home_score / away_score: placar para fins de pontuação (tempo regular, 90 min)
         home_score: useRegularTime ? regularTime!.home : fullTime.home,
         away_score: useRegularTime ? regularTime!.away : fullTime.away,
-        // placar real dos 90 min (iguais a home/away quando REGULAR)
-        regular_home_score: regularTime?.home ?? fullTime.home,
-        regular_away_score: regularTime?.away ?? fullTime.away,
+        // Placar acumulado final (fullTime da API — 7×6 no exemplo de pênaltis)
+        final_home_score: fullTime.home,
+        final_away_score: fullTime.away,
+        // Placar só do shootout de pênaltis (ex: 6×5); null se não houve
+        penalty_home_score: m.score.penalties?.home ?? null,
+        penalty_away_score: m.score.penalties?.away ?? null,
       };
     },
   );

@@ -213,15 +213,15 @@ export default function MatchesList({
                             </span>
                           </div>
 
-                          {/* Badge + placar final (pênaltis/prorrogação) */}
+                          {/* Badge + placar complementar (pênaltis/prorrogação) */}
                           {m.score_duration === "PENALTY_SHOOTOUT" && m.status === "FINISHED" && (
                             <div className="flex flex-col items-center gap-0.5">
                               <span className="text-[9px] text-amber-400/70 font-semibold tracking-wide uppercase">
-                                Pên:&nbsp;
+                                Pênalti: 
                                 <span className="font-extrabold text-amber-300">
-                                  {m.regular_home_score ?? 0}
-                                  &nbsp;×&nbsp;
-                                  {m.regular_away_score ?? 0}
+                                  {m.penalty_home_score ?? 0}
+                                   × 
+                                  {m.penalty_away_score ?? 0}
                                 </span>
                               </span>
                               <span className="text-[9px] text-amber-400 font-bold tracking-widest uppercase bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/25">
@@ -230,9 +230,19 @@ export default function MatchesList({
                             </div>
                           )}
                           {m.score_duration === "EXTRA_TIME" && m.status === "FINISHED" && (
-                            <span className="text-[9px] text-blue-400 font-bold tracking-widest uppercase bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/25">
-                              ⏱ Prorrogação
-                            </span>
+                            <div className="flex flex-col items-center gap-0.5">
+                              <span className="text-[9px] text-blue-400/70 font-semibold tracking-wide uppercase">
+                                Final: 
+                                <span className="font-extrabold text-blue-300">
+                                  {m.final_home_score ?? 0}
+                                   × 
+                                  {m.final_away_score ?? 0}
+                                </span>
+                              </span>
+                              <span className="text-[9px] text-blue-400 font-bold tracking-widest uppercase bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-500/25">
+                                ⏱ Prorrogação
+                              </span>
+                            </div>
                           )}
 
                         </div>

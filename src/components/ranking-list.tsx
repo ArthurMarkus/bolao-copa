@@ -301,7 +301,7 @@ export default function RankingList({ ranking }: RankingListProps) {
                                       <span className="text-[8px] text-amber-400/60 font-semibold leading-none">
                                         pên&nbsp;
                                         <span className="text-amber-300 font-extrabold">
-                                          {m.regular_home_score ?? 0}&nbsp;×&nbsp;{m.regular_away_score ?? 0}
+                                          {m.penalty_home_score ?? 0}&nbsp;×&nbsp;{m.penalty_away_score ?? 0}
                                         </span>
                                       </span>
                                       <span className="text-[8px] text-amber-400 font-bold uppercase bg-amber-500/10 px-1.5 py-px rounded-full border border-amber-500/25 leading-none">
@@ -310,11 +310,20 @@ export default function RankingList({ ranking }: RankingListProps) {
                                     </div>
                                   )}
                                   {m.score_duration === "EXTRA_TIME" && m.status === "FINISHED" && (
-                                    <span className="text-[8px] text-blue-400 font-bold uppercase bg-blue-500/10 px-1.5 py-px rounded-full border border-blue-500/25 leading-none">
-                                      ⏱ Prorr.
-                                    </span>
+                                    <div className="flex flex-col items-center gap-px">
+                                      <span className="text-[8px] text-blue-400/60 font-semibold leading-none">
+                                        final&nbsp;
+                                        <span className="text-blue-300 font-extrabold">
+                                          {m.final_home_score ?? 0}&nbsp;×&nbsp;{m.final_away_score ?? 0}
+                                        </span>
+                                      </span>
+                                      <span className="text-[8px] text-blue-400 font-bold uppercase bg-blue-500/10 px-1.5 py-px rounded-full border border-blue-500/25 leading-none">
+                                        ⏱ Prorr.
+                                      </span>
+                                    </div>
                                   )}
                                 </div>
+
 
 
                                 <div className="flex items-center gap-2 text-left flex-1 justify-start min-w-0">
