@@ -363,212 +363,96 @@ export default function BracketForm({
   );
 
   // Mapeamento explícito do chaveamento real da Copa 2026.
-  // Cada entrada [a, b] indica quais dois jogos da rodada anterior alimentam
-  // o slot correspondente desta rodada (na ordem em que aparecem no bracket).
+  // Feeders por id de partida:
+  //   LAST_16:
+  //     375 ← [415,416]   376 ← [417,418]
+  //     377 ← [423,424]   378 ← [425,426]
+  //     379 ← [419,420]   380 ← [421,422]
+  //     381 ← [427,428]   382 ← [429,430]
+  //   QF:
+  //     383 ← [375,376]   384 ← [379,380]
+  //     385 ← [377,378]   386 ← [381,382]
+  //   SF:  387 ← [383,384]   388 ← [385,386]
+  //   FINAL (390) ← [387,388]
   //
-  // LAST_16 (por id_match): 375, 376, 377, 378, 379, 380, 381, 382
-  // LAST_32 feeders (por id_match):
-  //   375 ← [415, 416]   376 ← [417, 418]
-  //   377 ← [423, 424]   378 ← [425, 426]
-  //   379 ← [419, 420]   380 ← [421, 422]
-  //   381 ← [427, 428]   382 ← [429, 430]
-  //
-  // QUARTER_FINALS (por id_match): 383, 384, 385, 386
-  // LAST_16 feeders:
-  //   383 ← [375, 376]   384 ← [379, 380]
-  //   385 ← [377, 378]   386 ← [381, 382]
-  //
-  // SEMI_FINALS (por id_match): 387, 388
-  // QUARTER_FINALS feeders:
-  //   387 ← [383, 384]   388 ← [385, 386]
-  //
-  // FINAL (id 390): ← [387, 388]
-
-  // Índices dentro do array ordenado de cada fase (0-based)
-  // LAST_32 indices: 0=415, 1=416, 2=417, 3=418, 4=419, 5=420,
-  //                  6=421, 7=422, 8=423, 9=424, 10=425, 11=426,
-  //                  12=427, 13=428, 14=429, 15=430
-  // LAST_16 indices: 0=375, 1=376, 2=377, 3=378, 4=379, 5=380, 6=381, 7=382
+  // Layout visual (LAST_32 mantém ordem original por id):
+  //   LEFT  L32: [415,416,417,418,419,420,421,422]
+  //   LEFT  L16: [375,376,379,380]
+  //   LEFT  QF:  [383,384]
+  //   LEFT  SF:  [387]
+  //   RIGHT L32: [423,424,425,426,427,428,429,430]
+  //   RIGHT L16: [377,378,381,382]
+  //   RIGHT QF:  [385,386]
+  //   RIGHT SF:  [388]
 
   const byId = (arr: Match[], id: number) => arr.find((m) => m.id_match === id);
 
-  // Helper: devolve o pick ou "A definir" para um jogo da rodada anterior
   const pickOf = (match: Match | undefined) =>
     match ? (picks[match.id_match] ?? "A definir") : "A definir";
 
-  // Helper: se o jogo já tem os times definidos pela API, usa-os;
-  // caso contrário, deriva do pick da rodada anterior.
-  const resolveTeam = (
-    apiTeam: string,
-    feederMatch: Match | undefined,
-  ): string => {
+  const resolveTeam = (apiTeam: string, feederMatch: Match | undefined): string => {
     if (apiTeam && apiTeam !== "A definir") return apiTeam;
     return pickOf(feederMatch);
   };
 
+  const mkNext = (
+    match: Match | undefined,
+    f0: Match | undefined,
+    f1: Match | undefined,
+  ): Match | undefined => {
+    if (!match) return undefined;
+    return {
+      ...match,
+      team_home: resolveTeam(match.team_home, f0),
+      team_away: resolveTeam(match.team_away, f1),
+    };
+  };
+
   const l32 = matchesByStage["LAST_32"];
   const l16 = matchesByStage["LAST_16"];
-  const qf = matchesByStage["QUARTER_FINALS"];
-  const sf = matchesByStage["SEMI_FINALS"];
+  const qf  = matchesByStage["QUARTER_FINALS"];
+  const sf  = matchesByStage["SEMI_FINALS"];
   const fin = matchesByStage["FINAL"];
 
-  // ── Chaveamento real (por ID de partida) ──────────────────────────────────
-  // Left side do bracket (top)
-  const left32Top = [
-    byId(l32, 537415),
-    byId(l32, 537416),
-    byId(l32, 537417),
-    byId(l32, 537418),
-  ].filter(Boolean) as Match[];
+  // ── LAST_32: ordem original por id, dividida ao meio ────────────────────────
+  const left32  = l32.slice(0, 8); // [415,416,417,418,419,420,421,422]
+  const right32 = l32.slice(8);    // [423,424,425,426,427,428,429,430]
 
-  const left32Bottom = [
-    byId(l32, 537423),
-    byId(l32, 537424),
-    byId(l32, 537425),
-    byId(l32, 537426),
-  ].filter(Boolean) as Match[];
+  // ── LAST_16: times resolvidos com feeders explícitos ────────────────────────
+  const l16_375 = mkNext(byId(l16, 537375), byId(l32, 537415), byId(l32, 537416));
+  const l16_376 = mkNext(byId(l16, 537376), byId(l32, 537417), byId(l32, 537418));
+  const l16_377 = mkNext(byId(l16, 537377), byId(l32, 537423), byId(l32, 537424));
+  const l16_378 = mkNext(byId(l16, 537378), byId(l32, 537425), byId(l32, 537426));
+  const l16_379 = mkNext(byId(l16, 537379), byId(l32, 537419), byId(l32, 537420));
+  const l16_380 = mkNext(byId(l16, 537380), byId(l32, 537421), byId(l32, 537422));
+  const l16_381 = mkNext(byId(l16, 537381), byId(l32, 537427), byId(l32, 537428));
+  const l16_382 = mkNext(byId(l16, 537382), byId(l32, 537429), byId(l32, 537430));
 
-  // Right side do bracket (top)
-  const right32Top = [
-    byId(l32, 537419),
-    byId(l32, 537420),
-    byId(l32, 537421),
-    byId(l32, 537422),
-  ].filter(Boolean) as Match[];
+  // Posição visual: left=[375,376,379,380]  right=[377,378,381,382]
+  const leftL16  = [l16_375, l16_376, l16_379, l16_380].filter(Boolean) as Match[];
+  const rightL16 = [l16_377, l16_378, l16_381, l16_382].filter(Boolean) as Match[];
 
-  const right32Bottom = [
-    byId(l32, 537427),
-    byId(l32, 537428),
-    byId(l32, 537429),
-    byId(l32, 537430),
-  ].filter(Boolean) as Match[];
+  // ── QUARTER_FINALS ──────────────────────────────────────────────────────────
+  const qf_383 = mkNext(byId(qf, 537383), l16_375, l16_376); // esq-top
+  const qf_384 = mkNext(byId(qf, 537384), l16_379, l16_380); // esq-bottom
+  const qf_385 = mkNext(byId(qf, 537385), l16_377, l16_378); // dir-top
+  const qf_386 = mkNext(byId(qf, 537386), l16_381, l16_382); // dir-bottom
 
-  // LAST_16 — resolve times: API se disponível, senão pick da rodada anterior
-  const mkL16 = (
-    match: Match | undefined,
-    f0: Match | undefined,
-    f1: Match | undefined,
-  ): Match | undefined => {
-    if (!match) return undefined;
-    return {
-      ...match,
-      team_home: resolveTeam(match.team_home, f0),
-      team_away: resolveTeam(match.team_away, f1),
-    };
-  };
+  const leftQFAll  = [qf_383, qf_384].filter(Boolean) as Match[];
+  const rightQFAll = [qf_385, qf_386].filter(Boolean) as Match[];
 
-  const l16_375 = mkL16(
-    byId(l16, 537375),
-    byId(l32, 537415),
-    byId(l32, 537416),
-  );
-  const l16_376 = mkL16(
-    byId(l16, 537376),
-    byId(l32, 537417),
-    byId(l32, 537418),
-  );
-  const l16_377 = mkL16(
-    byId(l16, 537377),
-    byId(l32, 537423),
-    byId(l32, 537424),
-  );
-  const l16_378 = mkL16(
-    byId(l16, 537378),
-    byId(l32, 537425),
-    byId(l32, 537426),
-  );
-  const l16_379 = mkL16(
-    byId(l16, 537379),
-    byId(l32, 537419),
-    byId(l32, 537420),
-  );
-  const l16_380 = mkL16(
-    byId(l16, 537380),
-    byId(l32, 537421),
-    byId(l32, 537422),
-  );
-  const l16_381 = mkL16(
-    byId(l16, 537381),
-    byId(l32, 537427),
-    byId(l32, 537428),
-  );
-  const l16_382 = mkL16(
-    byId(l16, 537382),
-    byId(l32, 537429),
-    byId(l32, 537430),
-  );
+  // ── SEMI_FINALS ─────────────────────────────────────────────────────────────
+  const sf_387 = mkNext(byId(sf, 537387), qf_383, qf_384);
+  const sf_388 = mkNext(byId(sf, 537388), qf_385, qf_386);
 
-  const leftL16Top = [l16_375, l16_376].filter(Boolean) as Match[];
-  const leftL16Bottom = [l16_377, l16_378].filter(Boolean) as Match[];
-  const rightL16Top = [l16_379, l16_380].filter(Boolean) as Match[];
-  const rightL16Bottom = [l16_381, l16_382].filter(Boolean) as Match[];
-
-  // QUARTER_FINALS
-  const mkQF = (
-    match: Match | undefined,
-    f0: Match | undefined,
-    f1: Match | undefined,
-  ): Match | undefined => {
-    if (!match) return undefined;
-    return {
-      ...match,
-      team_home: resolveTeam(match.team_home, f0),
-      team_away: resolveTeam(match.team_away, f1),
-    };
-  };
-
-  const qf_383 = mkQF(byId(qf, 537383), l16_375, l16_376);
-  const qf_384 = mkQF(byId(qf, 537384), l16_379, l16_380);
-  const qf_385 = mkQF(byId(qf, 537385), l16_377, l16_378);
-  const qf_386 = mkQF(byId(qf, 537386), l16_381, l16_382);
-
-  const leftQF = [qf_383].filter(Boolean) as Match[];
-  const leftQFBottom = [qf_385].filter(Boolean) as Match[];
-  const rightQF = [qf_384].filter(Boolean) as Match[];
-  const rightQFBottom = [qf_386].filter(Boolean) as Match[];
-
-  // SEMI_FINALS
-  const mkSF = (
-    match: Match | undefined,
-    f0: Match | undefined,
-    f1: Match | undefined,
-  ): Match | undefined => {
-    if (!match) return undefined;
-    return {
-      ...match,
-      team_home: resolveTeam(match.team_home, f0),
-      team_away: resolveTeam(match.team_away, f1),
-    };
-  };
-
-  const sf_387 = mkSF(byId(sf, 537387), qf_383, qf_384);
-  const sf_388 = mkSF(byId(sf, 537388), qf_385, qf_386);
-
-  const leftSF = [sf_387].filter(Boolean) as Match[];
+  const leftSF  = [sf_387].filter(Boolean) as Match[];
   const rightSF = [sf_388].filter(Boolean) as Match[];
 
-  // FINAL
+  // ── FINAL ───────────────────────────────────────────────────────────────────
   const finalBase = fin[0];
   const finalMatches: Match[] = finalBase
-    ? [
-        {
-          ...finalBase,
-          team_home: resolveTeam(finalBase.team_home, sf_387),
-          team_away: resolveTeam(finalBase.team_away, sf_388),
-        },
-      ]
+    ? [{ ...finalBase, team_home: resolveTeam(finalBase.team_home, sf_387), team_away: resolveTeam(finalBase.team_away, sf_388) }]
     : [];
-
-  // Grupos para o layout visual do bracket
-  // Left side: top half (415,416,417,418 → 375,376 → 383) e bottom half (423,424,425,426 → 377,378 → 385)
-  // Right side: top half (419,420,421,422 → 379,380 → 384) e bottom half (427,428,429,430 → 381,382 → 386)
-  // Semis: sf_387 (left), sf_388 (right)
-  const left32 = [...left32Top, ...left32Bottom];
-  const leftL16 = [...leftL16Top, ...leftL16Bottom];
-  const leftQFAll = [...leftQF, ...leftQFBottom];
-  const right32 = [...right32Top, ...right32Bottom];
-  const rightL16 = [...rightL16Top, ...rightL16Bottom];
-  const rightQFAll = [...rightQF, ...rightQFBottom];
 
   const colProps = (stage: string, matchList: Match[]) => ({
     stage,
