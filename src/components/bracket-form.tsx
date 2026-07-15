@@ -40,36 +40,45 @@ function TeamButton({
   const isSelected = picks[match.id_match] === team;
   const isUndefined = team === "A definir";
 
-  const isRealWinner = realWinner === team
-  const isCorrectPick = isSelected && isRealWinner
+  const isRealWinner = realWinner === team;
+  const isCorrectPick = isSelected && isRealWinner;
 
-return (
-  <button
-    disabled={locked || isUndefined}
-    onClick={() => {
-      if (isDragging.current || locked || isUndefined) return;
-      onPick(match.id_match, team);
-    }}
-    className={[
-      "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-150",
-      isHome ? "border-b border-gray-800/80" : "",
-      isCorrectPick
-        ? "bg-yellow-500/20 text-yellow-400"
-        : isRealWinner
-          ? "bg-yellow-500/10 text-yellow-600"
-          : isSelected
-            ? "bg-emerald-500/20 text-emerald-400"
-            : locked || isUndefined
-              ? "cursor-not-allowed text-gray-600"
-              : "cursor-pointer text-gray-300 hover:bg-white/5",
-    ].join(" ")}
-  >
-    <FlagEmoji emoji={getFlagEmoji(team)} title={team} size={16} className="shrink-0" />
-    <span className="flex-1 truncate">{team}</span>
-    {isCorrectPick && <span className="shrink-0 text-xs text-yellow-500">★</span>}
-    {isSelected && !isCorrectPick && <span className="shrink-0 text-xs text-emerald-500">✓</span>}
-  </button>
-);
+  return (
+    <button
+      disabled={locked || isUndefined}
+      onClick={() => {
+        if (isDragging.current || locked || isUndefined) return;
+        onPick(match.id_match, team);
+      }}
+      className={[
+        "flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm font-medium transition-all duration-150",
+        isHome ? "border-b border-gray-800/80" : "",
+        isCorrectPick
+          ? "bg-yellow-500/20 text-yellow-400"
+          : isRealWinner
+            ? "bg-yellow-500/10 text-yellow-600"
+            : isSelected
+              ? "bg-emerald-500/20 text-emerald-400"
+              : locked || isUndefined
+                ? "cursor-not-allowed text-gray-600"
+                : "cursor-pointer text-gray-300 hover:bg-white/5",
+      ].join(" ")}
+    >
+      <FlagEmoji
+        emoji={getFlagEmoji(team)}
+        title={team}
+        size={16}
+        className="shrink-0"
+      />
+      <span className="flex-1 truncate">{team}</span>
+      {isCorrectPick && (
+        <span className="shrink-0 text-xs text-yellow-500">★</span>
+      )}
+      {isSelected && !isCorrectPick && (
+        <span className="shrink-0 text-xs text-emerald-500">✓</span>
+      )}
+    </button>
+  );
 }
 
 // ─── MatchCard ────────────────────────────────────────────────────────────────
@@ -80,16 +89,26 @@ function MatchCard({
   onPick,
   isDragging,
   locked,
+  stage,
 }: {
   match: Match;
   picks: Record<number, string>;
   onPick: (matchId: number, team: string) => void;
   isDragging: React.RefObject<boolean>;
   locked: boolean;
+  stage: string;
 }) {
-  const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
-    ? match.home_score > match.away_score ? match.team_home : match.team_away : null
+  const realWinner =
+    match.status === "FINISHED" &&
+    match.final_home_score !== null &&
+    match.final_away_score !== null
+      ? match.final_home_score > match.final_away_score
+        ? match.team_home
+        : match.team_away
+      : null;
   const hasWinner = !!picks[match.id_match];
+  const userPick = picks[match.id_match];
+  const userWasRight = userPick === realWinner;
 
   return (
     <div
@@ -120,6 +139,18 @@ function MatchCard({
         locked={locked}
         realWinner={realWinner}
       />
+      {match.status === "FINISHED" && userPick && stage !== "LAST_32" && (
+        <div
+          className={`px-3 py-1.5 text-xs border-t border-gray-800/80 flex items-center gap-1.5 ${
+            userWasRight
+              ? "text-yellow-500 bg-yellow-500/5"
+              : "text-gray-500 bg-transparent"
+          }`}
+        >
+          <span>{userWasRight ? "★" : "✗"}</span>
+          <span>Seu palpite: {userPick}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -157,6 +188,7 @@ function BracketColumn({
             onPick={onPick}
             isDragging={isDragging}
             locked={locked}
+            stage={stage}
           />
         ))}
       </div>
@@ -182,8 +214,14 @@ function FinalCard({
   locked: boolean;
 }) {
   const champion = picks[match.id_match];
-  const realWinner = match.status === 'FINISHED' && match.home_score !== null && match.away_score !== null
-    ? match.home_score > match.away_score ? match.team_home : match.team_away : null
+  const realWinner =
+    match.status === "FINISHED" &&
+    match.final_home_score !== null &&
+    match.final_away_score !== null
+      ? match.final_home_score > match.final_away_score
+        ? match.team_home
+        : match.team_away
+      : null;
 
   return (
     <div className="relative px-2">
@@ -352,8 +390,7 @@ export default function BracketForm({
   //                  12=427, 13=428, 14=429, 15=430
   // LAST_16 indices: 0=375, 1=376, 2=377, 3=378, 4=379, 5=380, 6=381, 7=382
 
-  const byId = (arr: Match[], id: number) =>
-    arr.find((m) => m.id_match === id);
+  const byId = (arr: Match[], id: number) => arr.find((m) => m.id_match === id);
 
   // Helper: devolve o pick ou "A definir" para um jogo da rodada anterior
   const pickOf = (match: Match | undefined) =>
@@ -407,7 +444,11 @@ export default function BracketForm({
   ].filter(Boolean) as Match[];
 
   // LAST_16 — resolve times: API se disponível, senão pick da rodada anterior
-  const mkL16 = (match: Match | undefined, f0: Match | undefined, f1: Match | undefined): Match | undefined => {
+  const mkL16 = (
+    match: Match | undefined,
+    f0: Match | undefined,
+    f1: Match | undefined,
+  ): Match | undefined => {
     if (!match) return undefined;
     return {
       ...match,
@@ -416,14 +457,46 @@ export default function BracketForm({
     };
   };
 
-  const l16_375 = mkL16(byId(l16, 537375), byId(l32, 537415), byId(l32, 537416));
-  const l16_376 = mkL16(byId(l16, 537376), byId(l32, 537417), byId(l32, 537418));
-  const l16_377 = mkL16(byId(l16, 537377), byId(l32, 537423), byId(l32, 537424));
-  const l16_378 = mkL16(byId(l16, 537378), byId(l32, 537425), byId(l32, 537426));
-  const l16_379 = mkL16(byId(l16, 537379), byId(l32, 537419), byId(l32, 537420));
-  const l16_380 = mkL16(byId(l16, 537380), byId(l32, 537421), byId(l32, 537422));
-  const l16_381 = mkL16(byId(l16, 537381), byId(l32, 537427), byId(l32, 537428));
-  const l16_382 = mkL16(byId(l16, 537382), byId(l32, 537429), byId(l32, 537430));
+  const l16_375 = mkL16(
+    byId(l16, 537375),
+    byId(l32, 537415),
+    byId(l32, 537416),
+  );
+  const l16_376 = mkL16(
+    byId(l16, 537376),
+    byId(l32, 537417),
+    byId(l32, 537418),
+  );
+  const l16_377 = mkL16(
+    byId(l16, 537377),
+    byId(l32, 537423),
+    byId(l32, 537424),
+  );
+  const l16_378 = mkL16(
+    byId(l16, 537378),
+    byId(l32, 537425),
+    byId(l32, 537426),
+  );
+  const l16_379 = mkL16(
+    byId(l16, 537379),
+    byId(l32, 537419),
+    byId(l32, 537420),
+  );
+  const l16_380 = mkL16(
+    byId(l16, 537380),
+    byId(l32, 537421),
+    byId(l32, 537422),
+  );
+  const l16_381 = mkL16(
+    byId(l16, 537381),
+    byId(l32, 537427),
+    byId(l32, 537428),
+  );
+  const l16_382 = mkL16(
+    byId(l16, 537382),
+    byId(l32, 537429),
+    byId(l32, 537430),
+  );
 
   const leftL16Top = [l16_375, l16_376].filter(Boolean) as Match[];
   const leftL16Bottom = [l16_377, l16_378].filter(Boolean) as Match[];
@@ -431,7 +504,11 @@ export default function BracketForm({
   const rightL16Bottom = [l16_381, l16_382].filter(Boolean) as Match[];
 
   // QUARTER_FINALS
-  const mkQF = (match: Match | undefined, f0: Match | undefined, f1: Match | undefined): Match | undefined => {
+  const mkQF = (
+    match: Match | undefined,
+    f0: Match | undefined,
+    f1: Match | undefined,
+  ): Match | undefined => {
     if (!match) return undefined;
     return {
       ...match,
@@ -451,7 +528,11 @@ export default function BracketForm({
   const rightQFBottom = [qf_386].filter(Boolean) as Match[];
 
   // SEMI_FINALS
-  const mkSF = (match: Match | undefined, f0: Match | undefined, f1: Match | undefined): Match | undefined => {
+  const mkSF = (
+    match: Match | undefined,
+    f0: Match | undefined,
+    f1: Match | undefined,
+  ): Match | undefined => {
     if (!match) return undefined;
     return {
       ...match,
