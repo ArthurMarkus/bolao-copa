@@ -109,11 +109,6 @@ function MatchCard({
   const hasWinner = !!picks[match.id_match];
   const userPick = picks[match.id_match];
   const userWasRight = userPick === realWinner;
-  // Só exibe o banner se o pick salvo é um dos times reais desta partida.
-  // Picks feitos quando a bracket tinha mapeamento incorreto podem ter guardado
-  // times de outra partida — nesses casos ocultamos o banner para evitar confusão.
-  const pickIsValid =
-    userPick === match.team_home || userPick === match.team_away;
 
   return (
     <div
@@ -144,7 +139,7 @@ function MatchCard({
         locked={locked}
         realWinner={realWinner}
       />
-      {match.status === "FINISHED" && userPick && stage !== "LAST_32" && pickIsValid && (
+      {match.status === "FINISHED" && userPick && stage !== "LAST_32" && (
         <div
           className={`px-3 py-1.5 text-xs border-t border-gray-800/80 flex items-center gap-1.5 ${
             userWasRight
